@@ -1081,6 +1081,8 @@ img { max-width: 100%; height: auto; display: block; }
   display: flex;
   justify-content: space-between;
   align-items: center;
+  flex-wrap: wrap;
+  gap: 16px;
 }
 
 .footer-brand {
@@ -1098,7 +1100,7 @@ img { max-width: 100%; height: auto; display: block; }
 .footer-copy {
   font-size: 13px;
   color: rgba(255,255,255,0.5);
-  white-space: nowrap;
+  white-space: normal;
 }
 
 .footer-social {
@@ -2025,6 +2027,7 @@ img { max-width: 100%; height: auto; display: block; }
   .process { padding: 20px 0 60px; }
   .cta-section { padding: 60px 0; }
   .section-label { margin-bottom: 6px; }
+  .hero-headline-dynamic-wrapper { transform: translateX(0); }
   .portfolio-card-body { padding: 16px; }
   .service-page-card { padding: 24px 0; gap: 20px; }
 }
