@@ -601,9 +601,13 @@ img { max-width: 100%; height: auto; display: block; }
   padding: 120px 0;
 }
 
+.services .container {
+  max-width: 1400px;
+}
+
 .services-grid {
   display: grid;
-  grid-template-columns: 1fr 1fr;
+  grid-template-columns: 1fr;
   gap: 1.25rem;
 }
 
@@ -616,7 +620,16 @@ img { max-width: 100%; height: auto; display: block; }
   overflow: hidden;
   border: 1px solid rgba(255,255,255,0.06);
   border-radius: 16px;
-  transition: all 0.5s ease;
+  transition: border-color 0.5s ease, box-shadow 0.5s ease, opacity 1.2s ease, filter 1.2s ease, transform 1.2s ease;
+  opacity: 0;
+  filter: blur(10px);
+  transform: scale(0.95);
+}
+
+.service-card.visible {
+  opacity: 1;
+  filter: blur(0px);
+  transform: scale(1);
 }
 
 .service-card:hover {
@@ -762,33 +775,68 @@ img { max-width: 100%; height: auto; display: block; }
   color: #00DEFF;
 }
 
-.service-card-arrow {
-  display: inline-flex;
-  align-items: center;
-  gap: 8px;
-  font-size: 14px;
-  font-weight: 500;
-  color: rgba(255,255,255,0.5);
-  transition: all 0.3s ease;
+.service-card-keywords {
   position: relative;
   z-index: 1;
 }
 
-.service-card-arrow:hover {
+.service-card-keywords-label {
+  font-size: 11px;
+  font-weight: 500;
+  color: rgba(255,255,255,0.3);
+  text-transform: uppercase;
+  letter-spacing: 1px;
+  margin-bottom: 8px;
+}
+
+.service-card-keywords-list {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+}
+
+.service-card-keyword {
+  font-size: 11px;
+  padding: 4px 10px;
+  border-radius: 100px;
+  border: 1px solid rgba(255,255,255,0.1);
+  color: rgba(255,255,255,0.5);
+  user-select: none;
+}
+
+.service-card-footer {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  margin-top: auto;
+  position: relative;
+  z-index: 1;
+}
+
+.service-card-footer-divider {
+  display: block;
+  width: 100%;
+  height: 1px;
+  background: rgba(255,255,255,0.06);
+}
+
+.service-card-arrow {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: 10px 28px;
+  font-size: 14px;
+  font-weight: 600;
   color: #00DEFF;
+  background: rgba(0, 222, 255, 0.08);
+  border: 1px solid rgba(0, 222, 255, 0.2);
+  border-radius: 100px;
+  transition: background 0.3s ease;
+  align-self: flex-start;
 }
 
-.service-card-arrow svg {
-  width: 16px;
-  height: 16px;
-  stroke: currentColor;
-  fill: none;
-  stroke-width: 2;
-  transition: transform 0.3s ease;
-}
-
-.service-card-arrow:hover svg {
-  transform: translateX(4px);
+.service-card-arrow:hover {
+  background: rgba(0, 222, 255, 0.16);
 }
 
 .service-card.coming-soon {
