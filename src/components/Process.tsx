@@ -6,6 +6,7 @@ interface Step {
   num: string
   total: string
   title: string
+  subheading: string
   desc: string
   items: string[]
   img: string
@@ -15,35 +16,39 @@ interface Step {
 const steps: Step[] = [
   {
     num: '01', total: '04',
-    title: 'Strategy',
-    desc: 'We get to know you and your brand. Goals, audience, competition. Out of that comes the roadmap everything else stands on.',
-    items: ['Briefing & Discovery', 'Competitor Analysis', 'Brand Strategy', 'Roadmap'],
-    img: 'https://aerukart.com/wp-content/uploads/2025/07/BANDY-IMAGE-PORTFOLIO.webp',
-    alt: 'Strategy',
+    title: 'Concept & Strategy',
+    subheading: 'Phase 01 / Discovery & Moodboarding',
+    desc: 'Every great asset starts with a solid game plan. We dive deep into your project goals, establish a creative direction, and align on a visual style that stands out—whether it\'s a wireframe for a site, a video script, or a brand mood board.',
+    items: ['Project Goal Planning', 'Creative Direction', 'Visual Style Alignment', 'Wireframe & Scripting'],
+    img: 'https://res.cloudinary.com/dqeflf8z7/image/upload/v1782756085/card-1_joy7nd.jpg',
+    alt: 'Concept & Strategy',
   },
   {
     num: '02', total: '04',
-    title: 'Design',
-    desc: 'Identity, interface, prototype. This is where the brand becomes visible — from the first sketch to the last pixel.',
-    items: ['Wireframes & UX', 'Visual Identity', 'UI Design', 'Prototyping'],
-    img: 'https://aerukart.com/wp-content/uploads/2025/07/ACADEMY-RIVALS-IMAGE-PORTFOLIO.webp',
-    alt: 'Design',
+    title: 'Design & Production',
+    subheading: 'Phase 02 / Asset Creation & Crafting',
+    desc: 'This is where raw ideas turn into premium visuals. I get to work inside the timeline or canvas—crafting high-fidelity branding, building lightning-fast web interfaces, cutting video timelines, or designing stream overlays from scratch.',
+    items: ['High-Fidelity Branding', 'Web Interface Development', 'Video Timeline Editing', 'Stream Overlay Design'],
+    img: 'https://res.cloudinary.com/dqeflf8z7/image/upload/v1782756085/card-2_t5kpgl.jpg',
+    alt: 'Design & Production',
   },
   {
     num: '03', total: '04',
-    title: 'Build',
-    desc: 'Engineering with modern tools. Clean code that scales and stands the test of time.',
-    items: ['Frontend & CMS', 'Performance & SEO', 'Quality Assurance', 'Testing'],
-    img: 'https://aerukart.com/wp-content/uploads/2025/10/TOPCOACH-IMAGE-PORTFOLIOa-1.webp',
-    alt: 'Build',
+    title: 'Review & Refine',
+    subheading: 'Phase 03 / Feedback & Polish',
+    desc: 'Collaboration is key, minus the agency friction. You review the first-cut files, interactive prototypes, or draft edits. We polish the details, color grade, fix bugs, and tune the fine details until everything is absolutely flawless.',
+    items: ['First-Cut Review', 'Interactive Prototype Testing', 'Detail Polish & Color Grade', 'Bug Fix & Tuning'],
+    img: 'https://res.cloudinary.com/dqeflf8z7/image/upload/v1782756085/card-3_poztjj.jpg',
+    alt: 'Review & Refine',
   },
   {
     num: '04', total: '04',
-    title: 'Launch & Care',
-    desc: 'Deployment, monitoring, and continuous optimization. We stay on it — your brand grows, and we grow with it.',
-    items: ['Go-Live', 'Analytics Setup', 'Maintenance & Updates', 'Iteration & Growth'],
-    img: 'https://aerukart.com/wp-content/uploads/2026/04/CRM-Tech-O-Banner-Portfolio.webp',
-    alt: 'Launch & Care',
+    title: 'Launch & Handover',
+    subheading: 'Phase 04 / Final Delivery & Setup',
+    desc: 'Ready for the world. I hand over fully organized branding packages, launch and host your new web platform, or deliver optimized video files and stream assets ready to hit upload or go live on OBS instantly.',
+    items: ['Organized Brand Package', 'Web Platform Launch', 'Optimized Video Delivery', 'OBS/Stream Setup'],
+    img: 'https://res.cloudinary.com/dqeflf8z7/image/upload/v1782756086/card-4_umhvis.jpg',
+    alt: 'Launch & Handover',
   },
 ]
 
@@ -98,7 +103,7 @@ export default function Process() {
     <section className="process" id="process">
       <div className="container">
         <div className="section-label">02 / Process</div>
-        <h2 className="section-title">From <em>briefing</em> to <em>launch.</em></h2>
+        <h2 className="section-title">From raw <em>concept</em> to final <em>delivery.</em></h2>
       </div>
       <div className="process-stack" ref={stackRef}>
         {steps.map((step, i) => (
@@ -116,6 +121,7 @@ export default function Process() {
                   {step.num}<span className="process-step-num-divider">/</span>{step.total}
                 </span>
                 <h3 className="process-step-title">{step.title}</h3>
+                <p className="process-step-subheading">{step.subheading}</p>
                 <p className="process-step-description">{step.desc}</p>
                 <ul className="process-deliverables">
                   {step.items.map((item, j) => (
