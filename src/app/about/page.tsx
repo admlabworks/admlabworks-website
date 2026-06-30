@@ -3,7 +3,7 @@
 import { useEffect, useState } from 'react'
 import CTA from '@/components/CTA'
 
-const rotatingTexts = ['and sharing.', 'and discussing.', 'and having fun.']
+const rotatingTexts = ['Graphic Designer', 'Motion Designer', 'Video Editor', 'Web Developer']
 
 export default function AboutPage() {
   const [textIndex, setTextIndex] = useState(0)
@@ -57,8 +57,9 @@ export default function AboutPage() {
           <h2 className="portfolio-title">ABOUT ME</h2>
 
           <div className="hero-anchor-links">
-            <span className="hero-anchor-link">ADM</span>
-            <span className="hero-anchor-link">LabWorks</span>
+            <span className="hero-anchor-link">ADM LabWorks</span>
+            <span className="hero-anchor-link">ADMVAI</span>
+            <span className="hero-anchor-link">Ajoy ADM</span>
           </div>
         </div>
 
@@ -68,12 +69,6 @@ export default function AboutPage() {
 
       <section className="about-main">
         <div className="about-main-inner">
-          <p className="about-headline">
-            Hello! I&apos;m ADM, a Graphic and Motion Designer based in Bangladesh.<br />
-            I love creating{' '}
-            <span className="about-rotating-text">{rotatingTexts[textIndex]}</span>
-          </p>
-
           <div className="about-photo">
             <img
               src="https://res.cloudinary.com/dqeflf8z7/image/upload/v1781445475/adm-cover_ecrpwf.jpg"
@@ -82,15 +77,38 @@ export default function AboutPage() {
             />
           </div>
 
-          <p className="about-bio-text">
-            Since the age of <strong>10</strong>, I&apos;ve wanted to dive into this field. It all started when I wanted to become a YouTuber. I needed <strong>a banner and a logo</strong>, so I started teaching myself from there. I&apos;m also passionate about photography and video games.
+          <p className="about-headline">
+            Hello! I&apos;m{' '}
+            <span className="about-highlight">Ajoy Mollik</span>, better known as{' '}
+            <span className="about-highlight">ADM</span>.<br />
+            I&apos;m a freelance {' '}
+            <span className="about-rotating-text">{rotatingTexts[textIndex]}</span>{' '}
+            based in{' '}
+            <span className="bangladesh-text">
+              <span className="bangladesh-char" style={{ '--i': 0 } as React.CSSProperties}>B</span>
+              <span className="bangladesh-char" style={{ '--i': 1 } as React.CSSProperties}>a</span>
+              <span className="bangladesh-char" style={{ '--i': 2 } as React.CSSProperties}>n</span>
+              <span className="bangladesh-char flag-red" style={{ '--i': 3 } as React.CSSProperties}>g</span>
+              <span className="bangladesh-char flag-red" style={{ '--i': 4 } as React.CSSProperties}>l</span>
+              <span className="bangladesh-char flag-red" style={{ '--i': 5 } as React.CSSProperties}>a</span>
+              <span className="bangladesh-char" style={{ '--i': 6 } as React.CSSProperties}>d</span>
+              <span className="bangladesh-char" style={{ '--i': 7 } as React.CSSProperties}>e</span>
+              <span className="bangladesh-char" style={{ '--i': 8 } as React.CSSProperties}>s</span>
+              <span className="bangladesh-char" style={{ '--i': 9 } as React.CSSProperties}>h</span>
+            </span>.
           </p>
 
-          <p className="about-bio-text">
-            In <strong>early 2018</strong>, I decided to officially launch as a <strong>Freelancer</strong> to get closer to <strong>my goal</strong>: to be <strong>professionally free</strong>.<br />
-            Since I was young, I&apos;ve had a few small clients with services like logos and banners &mdash; it was <strong>a logical step</strong> for me to take. The name <strong>&laquo; Aeruk &raquo;</strong> has always been my <strong>gaming pseudo</strong>, &laquo; Aeruk &raquo; mirrored becomes <strong>&laquo; Kurea &raquo;</strong>, a reference to my origins, <strong>South Korea.</strong>
-          </p>
+          <div className="about-banner-img">
+            <img
+              src="https://res.cloudinary.com/dqeflf8z7/image/upload/v1782840975/ADM_Branding_Page_ms6jiu.jpg"
+              alt="ADM Branding Overview"
+              loading="lazy"
+            />
+          </div>
 
+          <p className="about-bio-text">
+            In <strong>early 2018</strong>, I decided to officially launch as a <strong>Freelancer</strong> to pursue my ultimate goal: professional freedom. With over six years of experience helping businesses and creators stand out, my primary focus is crafting professional Brand Identities and Logo Designs that build immediate authority. I specialize in 100% custom, original work—absolutely no templates. To provide a complete digital solution, my services also include complete <strong>Web Design and Development, engaging Video Editing for content creators, high-converting Social Media Post Design, and custom stream overlays & animations for Twitch, YouTube, and TikTok.</strong>
+          </p>
           <a
             href="https://aerukart.com/wp-content/uploads/2026/04/Park-Doomin-CV-2026.pdf"
             target="_blank"

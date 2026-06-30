@@ -621,10 +621,12 @@ img { max-width: 100%; height: auto; display: block; }
   border: 1px solid rgba(255,255,255,0.06);
   border-radius: 16px;
   transition: border-color 0.3s ease, box-shadow 0.3s ease, background 0.3s ease;
+  animation: bounceIn 2s cubic-bezier(0.22, 1, 0.36, 1) both;
+  animation-play-state: paused;
 }
 
 .service-card.visible {
-  animation: bounceIn 2s cubic-bezier(0.22, 1, 0.36, 1) both;
+  animation-play-state: running;
 }
 
 @keyframes bounceIn {
@@ -1016,8 +1018,7 @@ img { max-width: 100%; height: auto; display: block; }
 
 .cta-marquee-wrap {
   --gap: clamp(24px, 4vw, 72px);
-  --dur: 20s;
-  display: flex;
+  --dur: 40s;
   overflow: hidden;
   user-select: none;
   mask-image: linear-gradient(90deg, transparent 20%, #000 30%, #000 70%, transparent 80%);
@@ -1028,17 +1029,30 @@ img { max-width: 100%; height: auto; display: block; }
   width: 100%;
 }
 
-.cta-marquee-content {
-  flex: 0 0 auto;
-  display: inline-flex;
-  align-items: center;
-  gap: var(--gap);
-  padding-inline: var(--gap);
-  margin: 0;
-  list-style: none;
-  white-space: nowrap;
+.cta-marquee-track {
+  display: flex;
+  flex-wrap: nowrap;
+  width: max-content;
   will-change: transform;
   animation: cta-scroll var(--dur) linear infinite;
+}
+
+.cta-marquee-content {
+  display: flex;
+  flex-wrap: nowrap;
+  align-items: center;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.cta-marquee-content > li {
+  flex-shrink: 0;
+  white-space: nowrap;
+}
+
+.cta-marquee-content > li + li {
+  margin-left: var(--gap);
 }
 
 .cta-marquee-content a {
@@ -1709,7 +1723,7 @@ img { max-width: 100%; height: auto; display: block; }
 }
 
 .about-rotating-text {
-  color: #C5F8FF;
+  color: #00DEFF;
   display: inline-block;
   animation: fadeText 0.5s ease;
 }
@@ -1719,14 +1733,54 @@ img { max-width: 100%; height: auto; display: block; }
   100% { opacity: 1; transform: translateY(0); }
 }
 
+.about-highlight {
+  color: #00DEFF;
+}
+
+.bangladesh-text {
+  display: inline-flex;
+  flex-wrap: nowrap;
+}
+
+.bangladesh-char {
+  color: #00A86B;
+  display: inline-block;
+  animation: flagWave 3s linear infinite;
+  animation-delay: calc(var(--i) * 0.08s);
+}
+
+.bangladesh-char.flag-red {
+  color: #F42A41;
+}
+
+@keyframes flagWave {
+  0% { transform: translateY(3px); }
+  25% { transform: translateY(-5px); }
+  50% { transform: translateY(3px); }
+  75% { transform: translateY(-2px); }
+  100% { transform: translateY(3px); }
+}
+
 .about-photo {
-  width: 100%;
+  width: 60%;
+  margin: 0 auto;
 }
 
 .about-photo img {
   width: 100%;
   height: auto;
   border-radius: 15px;
+  display: block;
+}
+
+.about-banner-img {
+  margin-top: 60px;
+  width: 100%;
+}
+
+.about-banner-img img {
+  width: 100%;
+  height: auto;
   display: block;
 }
 

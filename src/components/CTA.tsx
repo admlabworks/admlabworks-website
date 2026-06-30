@@ -9,9 +9,19 @@ const slides = [
   'Ready when you are.',
 ]
 
+const marqueeItems = [
+  'Ready to bring your project to life?',
+  "Let's talk.",
+  'Every great project starts with a conversation.',
+  "Let's talk.",
+  'Ready to make your brand shine?',
+  "Let's talk.",
+  'When do we start?',
+  "Let's talk.",
+]
+
 export default function CTA() {
   const containerRef = useRef<HTMLDivElement>(null)
-  const marqueeRef = useRef<HTMLDivElement>(null)
 
   useEffect(() => {
     const container = containerRef.current
@@ -31,37 +41,21 @@ export default function CTA() {
     return () => clearInterval(interval)
   }, [])
 
-  useEffect(() => {
-    const mq = marqueeRef.current
-    if (!mq) return
-
-    const content = mq.querySelector('.cta-marquee-content') as HTMLElement
-    if (!content) return
-    if (mq.querySelector('.cta-marquee-content[aria-hidden="true"]')) return
-
-    const clone = content.cloneNode(true) as HTMLElement
-    clone.setAttribute('aria-hidden', 'true')
-    mq.appendChild(clone)
-
-    const speed = mq.dataset.speed || '20s'
-    mq.querySelectorAll('.cta-marquee-content').forEach(el => {
-      (el as HTMLElement).style.animationDuration = speed
-    })
-  }, [])
-
   return (
     <section className="cta-section" id="contact">
-      <div className="cta-marquee-wrap" ref={marqueeRef} data-speed="20s">
-        <ul className="cta-marquee-content">
-          <li><a href="/contact">Ready to bring your project to life?</a></li>
-          <li><a href="/contact">Let&apos;s talk.</a></li>
-          <li><a href="/contact">Every great project starts with a conversation.</a></li>
-          <li><a href="/contact">Let&apos;s talk.</a></li>
-          <li><a href="/contact">Ready to make your brand shine?</a></li>
-          <li><a href="/contact">Let&apos;s talk.</a></li>
-          <li><a href="/contact">When do we start?</a></li>
-          <li><a href="/contact">Let&apos;s talk.</a></li>
-        </ul>
+      <div className="cta-marquee-wrap">
+        <div className="cta-marquee-track">
+          <ul className="cta-marquee-content">
+            {marqueeItems.map((text, i) => (
+              <li key={i}><a href="/contact">{text}</a></li>
+            ))}
+          </ul>
+          <ul className="cta-marquee-content" aria-hidden="true">
+            {marqueeItems.map((text, i) => (
+              <li key={i}><a href="/contact">{text}</a></li>
+            ))}
+          </ul>
+        </div>
       </div>
       <div className="cta-inner">
         <div className="cta-video-wrap">
