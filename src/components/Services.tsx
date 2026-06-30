@@ -12,7 +12,7 @@ interface Service {
 const services: Service[] = [
   {
     num: '01',
-    title: 'Brand Identity\n& Graphic Design',
+    title: 'Brand Identity & Graphic Design',
     desc: 'We create brand identities, digital interfaces, and visual content that communicate clearly, work consistently across every format, and reflect who the brand truly is.',
     items: [
       'Logo Design',
@@ -37,7 +37,7 @@ const services: Service[] = [
   },
   {
     num: '02',
-    title: 'Website Design\n& Development',
+    title: 'Website Design & Development',
     desc: 'Web Development is the foundation of digital success. It combines technical expertise, design thinking, and performance optimization to create web experiences that are fast, secure, and designed to achieve your business goals. From simple websites to complex web applications, we build digital properties that work as hard as you do.',
     items: [
       'Website Design',
@@ -59,7 +59,7 @@ const services: Service[] = [
   },
   {
     num: '03',
-    title: 'Video &\nVisual Content',
+    title: 'Video & Visual Content',
     desc: 'Captivating video content engineered for maximum retention. We cover everything from fast-paced, trendy social reels to polished talking-head videos, ensuring your narrative shines with professional-grade finishing.',
     items: [
       'Motion Graphics & Animation',
@@ -80,7 +80,7 @@ const services: Service[] = [
   },
   {
     num: '04',
-    title: 'Graphics for\nStreamers',
+    title: 'Graphics for Streamers',
     desc: 'Everything you need to elevate your stream\'s production value. We create cohesive, eye-catching visual packages that make your channel stand out and look professional across all major broadcasting platforms.',
     items: [
       'Streaming Overlays Package (TikTok/Twitch/Kick/YouTube)',
@@ -115,14 +115,23 @@ function TextRoll({ text, comingSoon }: { text: string; comingSoon?: boolean }) 
     <span className="service-card-title-text">
       {lines.map((line, li) => (
         <span key={li} className="text-roll-line">
-          {[...line].map((char, ci) => {
-            const displayChar = char === ' ' ? '\u00A0' : char
+          {line.split(/(\s+)/).map((segment, si) => {
+            if (/^\s+$/.test(segment)) {
+              return <span key={si} className="text-roll-space">{'\u00A0'}</span>
+            }
             return (
-              <span key={ci} className={`text-roll-char-wrap${comingSoon ? ' no-animate' : ''}`}>
-                <span className="text-roll-char-inner" style={{ transitionDelay: `${ci * 25}ms` }}>
-                  <span className="text-roll-char">{displayChar}</span>
-                  <span className="text-roll-char-clone" aria-hidden="true">{displayChar}</span>
-                </span>
+              <span key={si} className="text-roll-word">
+                {[...segment].map((char, ci) => {
+                  const displayChar = char === ' ' ? '\u00A0' : char
+                  return (
+                    <span key={ci} className={`text-roll-char-wrap${comingSoon ? ' no-animate' : ''}`}>
+                      <span className="text-roll-char-inner" style={{ transitionDelay: `${ci * 25}ms` }}>
+                        <span className="text-roll-char">{displayChar}</span>
+                        <span className="text-roll-char-clone" aria-hidden="true">{displayChar}</span>
+                      </span>
+                    </span>
+                  )
+                })}
               </span>
             )
           })}
@@ -151,7 +160,7 @@ export default function Services() {
           }
         })
       },
-      { rootMargin: '-80px' }
+      { rootMargin: '-40px' }
     )
 
     cards.forEach((card) => observer.observe(card))

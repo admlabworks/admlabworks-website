@@ -58,8 +58,9 @@ export default function Process() {
   useEffect(() => {
     const stack = stackRef.current
     if (!stack) return
+    if (window.innerWidth <= 768) return
 
-    const triggers: any[] = []
+    const cleanups: (() => void)[] = []
 
     async function init() {
       const gsap = (await import('gsap')).default
@@ -67,36 +68,31 @@ export default function Process() {
       gsap.registerPlugin(ScrollTrigger)
 
       const pins = stack!.querySelectorAll<HTMLElement>('.process-card-pin')
+      const total = pins.length
 
-      pins.forEach((pin) => {
+      pins.forEach((pin, i) => {
         const card = pin.querySelector('.process-card') as HTMLElement
+        if (!card || i >= total - 1) return
 
-        const tween = gsap.fromTo(card,
-          { scale: 0.92, opacity: 0.4 },
-          {
-            scale: 1,
-            opacity: 1,
-            ease: 'none',
-            scrollTrigger: {
-              trigger: pin,
-              start: 'top bottom',
-              end: 'top top+=250',
-              scrub: 1,
-              invalidateOnRefresh: true,
-            },
-          }
-        )
-        if (tween.scrollTrigger) triggers.push(tween.scrollTrigger)
+        const targetScale = 1 - (total - 1 - i) * 0.02
+
+        const tween = gsap.to(card, {
+          scale: targetScale,
+          ease: 'none',
+          scrollTrigger: {
+            trigger: pin,
+            start: 'top top',
+            end: () => `+=${window.innerHeight * 0.5}`,
+            scrub: 1,
+          },
+        })
+        if (tween.scrollTrigger) cleanups.push(() => tween.scrollTrigger!.kill())
       })
-
-      ScrollTrigger.refresh()
     }
 
     init()
 
-    return () => {
-      triggers.forEach(t => t.kill())
-    }
+    return () => { cleanups.forEach(fn => fn()) }
   }, [])
 
   return (
@@ -107,11 +103,7 @@ export default function Process() {
       </div>
       <div className="process-stack" ref={stackRef}>
         {steps.map((step, i) => (
-          <div
-            key={i}
-            className="process-card-pin"
-            style={{ '--i': i, zIndex: i + 1 } as React.CSSProperties}
-          >
+          <div key={i} className="process-card-pin" style={{ '--i': i, zIndex: i + 1 } as React.CSSProperties}>
             <article className="process-card">
               <div className="process-card-media">
                 <img src={step.img} alt={step.alt} loading="lazy" />

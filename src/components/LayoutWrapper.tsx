@@ -6,6 +6,7 @@ import MobileMenu from '@/components/MobileMenu'
 import Footer from '@/components/Footer'
 import Cursor from '@/components/Cursor'
 import SocialSidebar from '@/components/SocialSidebar'
+import SmoothScroll from '@/components/SmoothScroll'
 
 export default function LayoutWrapper({ children }: { children: React.ReactNode }) {
   const [menuOpen, setMenuOpen] = useState(false)
@@ -18,8 +19,13 @@ export default function LayoutWrapper({ children }: { children: React.ReactNode 
         const target = document.querySelector(href)
         if (target) {
           e.preventDefault()
-          const top = target.getBoundingClientRect().top + window.pageYOffset - 100
-          window.scrollTo({ top, behavior: 'smooth' })
+          const lenis = (window as any).__lenis
+          if (lenis) {
+            lenis.scrollTo(target, { offset: -100 })
+          } else {
+            const top = target.getBoundingClientRect().top + window.pageYOffset - 100
+            window.scrollTo({ top, behavior: 'smooth' })
+          }
         }
       })
     })
@@ -31,7 +37,9 @@ export default function LayoutWrapper({ children }: { children: React.ReactNode 
       <SocialSidebar />
       <Header onMenuOpen={() => setMenuOpen(true)} />
       <MobileMenu isOpen={menuOpen} onClose={() => setMenuOpen(false)} />
-      {children}
+      <SmoothScroll>
+        {children}
+      </SmoothScroll>
       <Footer />
     </>
   )
