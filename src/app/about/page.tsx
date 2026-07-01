@@ -63,7 +63,6 @@ export default function AboutPage() {
           </div>
         </div>
 
-        <div className="portfolio-spacer" />
         <div className="portfolio-fade-bottom" />
       </section>
 
@@ -98,16 +97,8 @@ export default function AboutPage() {
             </span>.
           </p>
 
-          <div className="about-banner-img">
-            <img
-              src="https://res.cloudinary.com/dqeflf8z7/image/upload/v1782840975/ADM_Branding_Page_ms6jiu.jpg"
-              alt="ADM Branding Overview"
-              loading="lazy"
-            />
-          </div>
-
           <p className="about-bio-text">
-            In <strong>early 2018</strong>, I decided to officially launch as a <strong>Freelancer</strong> to pursue my ultimate goal: professional freedom. With over six years of experience helping businesses and creators stand out, my primary focus is crafting professional Brand Identities and Logo Designs that build immediate authority. I specialize in 100% custom, original work—absolutely no templates. To provide a complete digital solution, my services also include complete <strong>Web Design and Development, engaging Video Editing for content creators, high-converting Social Media Post Design, and custom stream overlays & animations for Twitch, YouTube, and TikTok.</strong>
+            In <strong>early 2018</strong>, I decided to officially launch as a <strong>Freelancer</strong> to pursue my ultimate goal: professional freedom. With over six years of experience helping businesses and creators stand out, my primary focus is crafting professional Brand Identities and Logo Designs that build immediate authority. I specialize in 100% custom, original work—absolutely no templates. To provide a complete digital solution, my services also include complete <strong>Web Design & Development</strong>, engaging <strong>Video Editing</strong> for Content Creators, high converting <strong>Social Media Post Design</strong>, and custom <strong>Stream Overlays & Animations</strong> for <strong>Twitch, YouTube, and TikTok.</strong>
           </p>
           <a
             href="https://aerukart.com/wp-content/uploads/2026/04/Park-Doomin-CV-2026.pdf"
@@ -117,6 +108,14 @@ export default function AboutPage() {
           >
             Download my CV
           </a>
+
+          <div className="about-banner-img">
+            <img
+              src="https://res.cloudinary.com/dqeflf8z7/image/upload/v1782840975/ADM_Branding_Page_ms6jiu.jpg"
+              alt="ADM Branding Overview"
+              loading="lazy"
+            />
+          </div>
         </div>
       </section>
 

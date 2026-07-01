@@ -2,7 +2,7 @@
 
 import { useEffect, useRef, useState } from 'react'
 
-const words = ['BRAND IDENTITY', 'WEBSITE DESIGN', 'VIDEO EDITING']
+const words = ['GRAPHIC DESIGN', 'WEBSITE DESIGN', 'VIDEO EDITING', 'MOTION DESIGN', 'BRAND IDENTITY','GRAPHICS FOR STREAMERS', 'SOCIAL MEDIA CONTENT']
 
 export default function Hero() {
   const [activeIndex, setActiveIndex] = useState(0)
@@ -36,12 +36,9 @@ export default function Hero() {
                 key={i}
                 className={`word${i === activeIndex ? ' active' : ''}`}
                 style={{
-                  transition: 'opacity 0.4s ease, transform 0.4s ease',
-                  transform: i === activeIndex
-                    ? 'translateY(0)'
-                    : i < activeIndex
-                      ? 'translateY(-10px)'
-                      : 'translateY(10px)',
+                  transition: 'opacity 0.4s ease, transform 0.5s ease',
+                  transform: i === activeIndex ? 'rotateY(0deg)' : 'rotateY(90deg)',
+                  opacity: i === activeIndex ? 1 : 0,
                 }}
               >
                 {word}
@@ -51,7 +48,7 @@ export default function Hero() {
         </div>
         <h1 className="hero-title">ADM LABWORKS</h1>
         <p className="hero-subtitle">
-          I create clear, functional, and memorable designs. From brand identity to user interfaces, I help you build a digital presence that truly means something.
+          Just an independent creator making sure your digital presence hits the mark. Whether you need stream graphics, a sleek website, or a full brand overhaul, I keep things simple. You get an experienced creative partner, zero corporate fluff, and work that stands out.
         </p>
         <div className="hero-cta">
           <a href="/services" className="btn-primary btn-accent btn-large">My Services</a>

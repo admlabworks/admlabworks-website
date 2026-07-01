@@ -172,7 +172,7 @@ export default function Services() {
     <section className="services" id="services">
       <div className="container">
         <div className="section-label">01 / Services</div>
-        <h2 className="section-title">Big <em>ideas.</em> Zero agency drama.</h2>
+        <h2 className="section-title">Big <em>ideas.</em> Zero <em>agency</em> drama.</h2>
 
         <div className="services-grid" ref={gridRef}>
           {services.map((s, i) => (
