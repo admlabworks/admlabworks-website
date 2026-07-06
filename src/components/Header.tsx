@@ -17,7 +17,7 @@ export default function Header({ onMenuOpen }: { onMenuOpen: () => void }) {
           </nav>
         </div>
         <div className="header-start-btn" style={{ backdropFilter: 'blur(8px)', WebkitBackdropFilter: 'blur(8px)' }}>
-          <a href="/contact" className="btn-primary btn-accent">Get a Quote</a>
+          <a href="/contact" className="btn-modern" style={{ padding: '12px 20px' }}><span className="btn-modern_label">Get a Quote</span><span className="btn-modern_bg"></span></a>
         </div>
       </header>
 

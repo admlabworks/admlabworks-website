@@ -2,20 +2,25 @@
 
 import { useEffect, useState } from 'react'
 import CTA from '@/components/CTA'
+import ImageDistortion from '@/components/ImageDistortion'
+import { usePreloaderDone } from '@/context/PreloaderContext'
 
 const rotatingTexts = ['Graphic Designer', 'Motion Designer', 'Video Editor', 'Web Developer']
 
 export default function AboutPage() {
   const [textIndex, setTextIndex] = useState(0)
+  const { isPreloaderDone } = usePreloaderDone()
 
   useEffect(() => {
+    if (!isPreloaderDone) return
     const interval = setInterval(() => {
       setTextIndex(prev => (prev + 1) % rotatingTexts.length)
     }, 2500)
     return () => clearInterval(interval)
-  }, [])
+  }, [isPreloaderDone])
 
   useEffect(() => {
+    if (!isPreloaderDone) return
     async function initAnimations() {
       const gsap = (await import('gsap')).default
       const { ScrollTrigger } = await import('gsap/ScrollTrigger')
@@ -29,7 +34,7 @@ export default function AboutPage() {
       gsap.fromTo('.about-bio-text', { y: 40, opacity: 0 }, { y: 0, opacity: 1, duration: 0.8, ease: 'power3.out', delay: 0.8 })
     }
     initAnimations()
-  }, [])
+  }, [isPreloaderDone])
 
   return (
     <main>
@@ -69,10 +74,12 @@ export default function AboutPage() {
       <section className="about-main">
         <div className="about-main-inner">
           <div className="about-photo">
-            <img
-              src="https://res.cloudinary.com/dqeflf8z7/image/upload/v1781445475/adm-cover_ecrpwf.jpg"
-              alt="ADM Photo"
-              loading="lazy"
+            <ImageDistortion
+              imageSrc="https://res.cloudinary.com/dqeflf8z7/image/upload/v1781445475/adm-cover_ecrpwf.jpg"
+              grid={34}
+              mouse={0.12}
+              strength={1}
+              relaxation={0.9}
             />
           </div>
 
@@ -104,9 +111,9 @@ export default function AboutPage() {
             href="https://aerukart.com/wp-content/uploads/2026/04/Park-Doomin-CV-2026.pdf"
             target="_blank"
             rel="noopener noreferrer"
-            className="btn-primary btn-accent"
+            className="btn-modern btn-modern-large"
           >
-            Download my CV
+            <span className="btn-modern_label">Download my CV</span><span className="btn-modern_bg"></span>
           </a>
 
           <div className="about-banner-img">

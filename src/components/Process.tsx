@@ -54,6 +54,42 @@ const steps: Step[] = [
 
 export default function Process() {
   const stackRef = useRef<HTMLDivElement>(null)
+  const sectionRef = useRef<HTMLElement>(null)
+
+  useEffect(() => {
+    const el = sectionRef.current
+    if (!el) return
+
+    async function init() {
+      if (!el) return
+      const gsap = (await import('gsap')).default
+      const { ScrollTrigger } = await import('gsap/ScrollTrigger')
+      gsap.registerPlugin(ScrollTrigger)
+
+      const label = el.querySelector('.section-label')
+      const title = el.querySelector('.section-title')
+
+      if (label) {
+        gsap.fromTo(label,
+          { y: 60, opacity: 0 },
+          { y: 0, opacity: 1, duration: 0.8, ease: 'power3.out',
+            scrollTrigger: { trigger: label, start: 'top bottom', end: 'top 75%', scrub: 1 }
+          }
+        )
+      }
+
+      if (title) {
+        gsap.fromTo(title,
+          { y: 60, opacity: 0 },
+          { y: 0, opacity: 1, duration: 0.8, ease: 'power3.out',
+            scrollTrigger: { trigger: title, start: 'top bottom', end: 'top 75%', scrub: 1 }
+          }
+        )
+      }
+    }
+
+    init()
+  }, [])
 
   useEffect(() => {
     const stack = stackRef.current
@@ -96,7 +132,7 @@ export default function Process() {
   }, [])
 
   return (
-    <section className="process" id="process">
+    <section className="process" id="process" ref={sectionRef}>
       <div className="container">
         <div className="section-label">02 / Process</div>
         <h2 className="section-title">From raw <em>concept</em> to final <em>delivery.</em></h2>

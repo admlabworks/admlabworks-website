@@ -73,7 +73,7 @@ export default function MobileMenu({ isOpen, onClose }: { isOpen: boolean; onClo
       </div>
 
       <div className="mobile-nav-cta">
-        <a href="/contact" className="btn-primary" onClick={onClose}>Start a project</a>
+        <a href="/contact" className="btn-modern" onClick={onClose}><span className="btn-modern_label">Start a project</span><span className="btn-modern_bg"></span></a>
       </div>
     </div>
   )

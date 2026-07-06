@@ -143,6 +143,7 @@ function TextRoll({ text, comingSoon }: { text: string; comingSoon?: boolean }) 
 
 export default function Services() {
   const gridRef = useRef<HTMLDivElement>(null)
+  const sectionRef = useRef<HTMLElement>(null)
 
   useEffect(() => {
     const grid = gridRef.current
@@ -168,8 +169,43 @@ export default function Services() {
     return () => observer.disconnect()
   }, [])
 
+  useEffect(() => {
+    const el = sectionRef.current
+    if (!el) return
+
+    async function init() {
+      if (!el) return
+      const gsap = (await import('gsap')).default
+      const { ScrollTrigger } = await import('gsap/ScrollTrigger')
+      gsap.registerPlugin(ScrollTrigger)
+
+      const label = el.querySelector('.section-label')
+      const title = el.querySelector('.section-title')
+
+      if (label) {
+        gsap.fromTo(label,
+          { y: 60, opacity: 0 },
+          { y: 0, opacity: 1, duration: 0.8, ease: 'power3.out',
+            scrollTrigger: { trigger: label, start: 'top bottom', end: 'top 75%', scrub: 1 }
+          }
+        )
+      }
+
+      if (title) {
+        gsap.fromTo(title,
+          { y: 60, opacity: 0 },
+          { y: 0, opacity: 1, duration: 0.8, ease: 'power3.out',
+            scrollTrigger: { trigger: title, start: 'top bottom', end: 'top 75%', scrub: 1 }
+          }
+        )
+      }
+    }
+
+    init()
+  }, [])
+
   return (
-    <section className="services" id="services">
+    <section className="services" id="services" ref={sectionRef}>
       <div className="container">
         <div className="section-label">01 / Services</div>
         <h2 className="section-title">Big <em>ideas.</em> Zero <em>agency</em> drama.</h2>
@@ -183,26 +219,32 @@ export default function Services() {
               </h3>
               <p className="service-card-desc">{s.desc}</p>
               <span className="service-divider" />
-              <ul className="service-card-list">
-                {s.items.map((item, j) => (
-                  <li key={j}>
-                    <IconCheck />
-                    {item}
-                  </li>
-                ))}
-              </ul>
-              <div className="service-card-footer">
-                <a href={s.comingSoon ? undefined : '/contact'} className="service-card-arrow" style={s.comingSoon ? { pointerEvents: 'none' } : undefined}>
-                  {s.comingSoon ? 'Coming soon' : 'Enquire'}
-                </a>
-                <span className="service-card-footer-divider" />
-                <div className="service-card-keywords">
-                  <div className="service-card-keywords-label">Keywords</div>
-                  <div className="service-card-keywords-list">
-                    {s.keywords.map((kw, j) => (
-                      <span key={j} className="service-card-keyword">{kw}</span>
-                    ))}
+              <div className="service-card-content-row">
+                <ul className="service-card-list">
+                  {s.items.map((item, j) => (
+                    <li key={j}>
+                      <IconCheck />
+                      {item}
+                    </li>
+                  ))}
+                </ul>
+                <a href="/contact" className="service-btn">
+                  <span className="service-btn_label">Enquire</span>
+                  <div className="service-btn_color-wrap">
+                    <div className="service-btn_color _1" />
+                    <div className="service-btn_color _3" />
+                    <div className="service-btn_color _2" />
+                    <div className="service-btn_bg" />
                   </div>
+                </a>
+              </div>
+              <span className="service-list-divider" />
+              <div className="service-card-keywords">
+                <div className="service-card-keywords-label">Keywords</div>
+                <div className="service-card-keywords-list">
+                  {s.keywords.map((kw, j) => (
+                    <span key={j} className="service-card-keyword">{kw}</span>
+                  ))}
                 </div>
               </div>
             </div>

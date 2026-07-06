@@ -2,6 +2,7 @@
 
 import { useEffect } from 'react'
 import CTA from '@/components/CTA'
+import { usePreloaderDone } from '@/context/PreloaderContext'
 
 const services = [
   {
@@ -73,7 +74,10 @@ const anchorLinks = [
 ]
 
 export default function ServicesPage() {
+  const { isPreloaderDone } = usePreloaderDone()
+
   useEffect(() => {
+    if (!isPreloaderDone) return
     async function initAnimations() {
       const gsap = (await import('gsap')).default
       const { ScrollTrigger } = await import('gsap/ScrollTrigger')
@@ -94,7 +98,7 @@ export default function ServicesPage() {
       })
     }
     initAnimations()
-  }, [])
+  }, [isPreloaderDone])
 
   return (
     <main>
@@ -146,8 +150,8 @@ export default function ServicesPage() {
                     ))}
                   </ul>
                   <div className="service-page-card-ctas">
-                    <a href="/portfolio" className="btn-primary">View projects</a>
-                    <a href="/contact" className="btn-primary btn-accent">Start a project</a>
+                    <a href="/portfolio" className="btn-modern"><span className="btn-modern_label">View projects</span><span className="btn-modern_bg"></span></a>
+                    <a href="/contact" className="btn-modern"><span className="btn-modern_label">Start a project</span><span className="btn-modern_bg"></span></a>
                   </div>
                 </div>
                 <div className="service-page-card-img">

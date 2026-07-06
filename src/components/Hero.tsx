@@ -1,19 +1,24 @@
 'use client'
 
-import { useEffect, useRef, useState } from 'react'
+import dynamic from 'next/dynamic'
+import { useEffect, useState } from 'react'
+import { usePreloaderDone } from '@/context/PreloaderContext'
+
+const Logo3D = dynamic(() => import('@/components/Logo3D'), { ssr: false })
 
 const words = ['GRAPHIC DESIGN', 'WEBSITE DESIGN', 'VIDEO EDITING', 'MOTION DESIGN', 'BRAND IDENTITY','GRAPHICS FOR STREAMERS', 'SOCIAL MEDIA CONTENT']
 
 export default function Hero() {
   const [activeIndex, setActiveIndex] = useState(0)
-  const animRef = useRef<number | null>(null)
+  const { isPreloaderDone } = usePreloaderDone()
 
   useEffect(() => {
+    if (!isPreloaderDone) return
     const interval = setInterval(() => {
       setActiveIndex(prev => (prev + 1) % words.length)
     }, 2500)
     return () => clearInterval(interval)
-  }, [])
+  }, [isPreloaderDone])
 
   return (
     <section className="hero" id="hero">
@@ -29,6 +34,7 @@ export default function Hero() {
       <div className="hero-fade-bottom" />
 
       <div className="hero-content">
+        <div className="hero-logo-3d"><Logo3D /></div>
         <div className="hero-headline">
           <div className="hero-headline-dynamic-wrapper">
             {words.map((word, i) => (
@@ -48,10 +54,12 @@ export default function Hero() {
         </div>
         <h1 className="hero-title">ADM LABWORKS</h1>
         <p className="hero-subtitle">
-          Just an independent creator making sure your digital presence hits the mark. Whether you need stream graphics, a sleek website, or a full brand overhaul, I keep things simple. You get an experienced creative partner, zero corporate fluff, and work that stands out.
+          {"Just an independent creator making sure your digital presence hits the mark. Whether you need stream graphics, a sleek website, or a full brand overhaul, I keep things simple. You get an experienced creative partner, zero corporate fluff, and work that stands out.".split('').map((char, i) => (
+            <span key={i} className="hero-subtitle-char" style={{ opacity: 0 }}>{char}</span>
+          ))}
         </p>
         <div className="hero-cta">
-          <a href="/services" className="btn-primary btn-accent btn-large">My Services</a>
+          <a href="/services" className="btn-modern" style={{ padding: '12px 20px' }}><span className="btn-modern_label">My Services</span><span className="btn-modern_bg"></span></a>
         </div>
       </div>
 

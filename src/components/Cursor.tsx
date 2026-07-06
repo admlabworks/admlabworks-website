@@ -6,6 +6,9 @@ import { useMotionValue, useSpring } from 'framer-motion'
 export default function Cursor() {
   const cursorRef = useRef<HTMLDivElement>(null)
   const rafRef = useRef<number | null>(null)
+  const ready = useRef(false)
+  const settled = useRef(false)
+  const settleFallbackRef = useRef<ReturnType<typeof setTimeout> | null>(null)
 
   const cursorX = useMotionValue(-100)
   const cursorY = useMotionValue(-100)
@@ -19,6 +22,18 @@ export default function Cursor() {
     const onMove = (e: MouseEvent) => {
       cursorX.set(e.clientX)
       cursorY.set(e.clientY)
+      if (!ready.current) {
+        ready.current = true
+        settled.current = false
+        settleFallbackRef.current = setTimeout(() => {
+          cursor.classList.remove('hidden')
+          settled.current = true
+          settleFallbackRef.current = null
+        }, 800)
+      }
+      if (settled.current) {
+        cursor.classList.remove('hidden')
+      }
     }
 
     const onOver = (e: MouseEvent) => {
@@ -55,8 +70,24 @@ export default function Cursor() {
     }
 
     const animate = () => {
-      cursor.style.left = `${springX.get()}px`
-      cursor.style.top = `${springY.get()}px`
+      const sx = springX.get()
+      const sy = springY.get()
+      cursor.style.left = `${sx}px`
+      cursor.style.top = `${sy}px`
+
+      if (ready.current && !settled.current) {
+        const dx = Math.abs(sx - cursorX.get())
+        const dy = Math.abs(sy - cursorY.get())
+        if (dx < 1 && dy < 1) {
+          settled.current = true
+          cursor.classList.remove('hidden')
+          if (settleFallbackRef.current) {
+            clearTimeout(settleFallbackRef.current)
+            settleFallbackRef.current = null
+          }
+        }
+      }
+
       rafRef.current = requestAnimationFrame(animate)
     }
 
@@ -64,16 +95,33 @@ export default function Cursor() {
     document.addEventListener('mouseover', onOver)
     document.addEventListener('mousedown', onDown)
     document.addEventListener('mouseup', onUp)
+
+    const onEnter = () => {
+      if (!ready.current) return
+      cursor.classList.remove('hidden')
+    }
+    const onLeave = () => {
+      if (settled.current) cursor.classList.add('hidden')
+    }
+    document.documentElement.addEventListener('mouseenter', onEnter)
+    document.documentElement.addEventListener('mouseleave', onLeave)
+
     rafRef.current = requestAnimationFrame(animate)
 
     return () => {
+      if (settleFallbackRef.current) {
+        clearTimeout(settleFallbackRef.current)
+        settleFallbackRef.current = null
+      }
       document.removeEventListener('mousemove', onMove)
       document.removeEventListener('mouseover', onOver)
       document.removeEventListener('mousedown', onDown)
       document.removeEventListener('mouseup', onUp)
+      document.documentElement.removeEventListener('mouseenter', onEnter)
+      document.documentElement.removeEventListener('mouseleave', onLeave)
       if (rafRef.current) cancelAnimationFrame(rafRef.current)
     }
   }, [])
 
-  return <div className="cur" ref={cursorRef} />
+  return <div className="cur hidden" ref={cursorRef} />
 }

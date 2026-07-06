@@ -2,6 +2,7 @@
 
 import { useEffect, useState } from 'react'
 import CTA from '@/components/CTA'
+import { usePreloaderDone } from '@/context/PreloaderContext'
 
 interface Project {
   img: string
@@ -26,8 +27,10 @@ const categories = [
 
 export default function PortfolioPage() {
   const [activeFilter, setActiveFilter] = useState('__all')
+  const { isPreloaderDone } = usePreloaderDone()
 
   useEffect(() => {
+    if (!isPreloaderDone) return
     async function initAnimations() {
       const gsap = (await import('gsap')).default
       const { ScrollTrigger } = await import('gsap/ScrollTrigger')
@@ -48,7 +51,7 @@ export default function PortfolioPage() {
       })
     }
     initAnimations()
-  }, [])
+  }, [isPreloaderDone])
 
   const filteredProjects = activeFilter === '__all'
     ? projects

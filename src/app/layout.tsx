@@ -3,6 +3,7 @@ import { SpeedInsights } from "@vercel/speed-insights/next"
 import type { Metadata, Viewport } from 'next'
 import './globals.css'
 import LayoutWrapper from '@/components/LayoutWrapper'
+import { PreloaderProvider } from '@/context/PreloaderContext'
 
 export const metadata: Metadata = {
   title: 'ADM LABWORKS - Digital Services',
@@ -20,8 +21,9 @@ export const viewport: Viewport = {
 export default function RootLayout({ children }: { children: React.ReactNode }) {
   return (
     <html lang="en">
-      <body>
-        <LayoutWrapper>{children}</LayoutWrapper>
+      <body style={{ backgroundColor: '#000' }}>
+        <style dangerouslySetInnerHTML={{ __html: '.hero-logo-3d{position:relative}.hero-logo-3d::after{content:"";position:absolute;inset:0;background:#000;z-index:5;pointer-events:none}' }} />
+        <PreloaderProvider><LayoutWrapper>{children}</LayoutWrapper></PreloaderProvider>
         <Analytics />
         <SpeedInsights />
       </body>

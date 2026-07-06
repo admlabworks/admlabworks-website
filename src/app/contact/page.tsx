@@ -2,6 +2,7 @@
 
 import { useEffect, useState } from 'react'
 import CTA from '@/components/CTA'
+import { usePreloaderDone } from '@/context/PreloaderContext'
 
 const serviceOptions = [
   { value: '', label: 'Choose your service *' },
@@ -16,7 +17,10 @@ const serviceOptions = [
 ]
 
 export default function ContactPage() {
+  const { isPreloaderDone } = usePreloaderDone()
+
   useEffect(() => {
+    if (!isPreloaderDone) return
     async function initAnimations() {
       const gsap = (await import('gsap')).default
       const { ScrollTrigger } = await import('gsap/ScrollTrigger')
@@ -37,7 +41,7 @@ export default function ContactPage() {
       })
     }
     initAnimations()
-  }, [])
+  }, [isPreloaderDone])
 
   const [formData, setFormData] = useState({
     firstName: '',

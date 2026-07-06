@@ -70,7 +70,7 @@ export default function CTA() {
             ))}
           </div>
           <p className="cta-text">Tell me about your ideas and let&apos;s work together!</p>
-          <a href="/contact" className="btn-primary btn-accent btn-large">Start a project</a>
+          <a href="/contact" className="btn-modern btn-modern-large"><span className="btn-modern_label">Start a project</span><span className="btn-modern_bg"></span></a>
         </div>
       </div>
     </section>
