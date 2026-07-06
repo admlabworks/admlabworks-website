@@ -97,11 +97,11 @@ export default function Logo3D() {
   return (
     <Canvas
       camera={{ position: [0, 0, 5], fov: 50 }}
-      gl={{ antialias: true, alpha: false }}
-      style={{ background: '#000' }}
+      gl={{ antialias: true, alpha: true }}
+      style={{ background: 'transparent' }}
       onCreated={(state) => {
-        state.gl.setClearColor('#000000')
-        state.gl.domElement.style.background = '#000'
+        state.gl.setClearColor(0x000000, 0)
+        state.gl.domElement.style.background = 'transparent'
         const container = state.gl.domElement.closest('.hero-logo-3d')
         if (container) container.classList.add('canvas-ready')
       }}

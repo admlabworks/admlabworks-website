@@ -184,18 +184,18 @@ export default function Services() {
 
       if (label) {
         gsap.fromTo(label,
-          { y: 60, opacity: 0 },
-          { y: 0, opacity: 1, duration: 0.8, ease: 'power3.out',
-            scrollTrigger: { trigger: label, start: 'top bottom', end: 'top 75%', scrub: 1 }
+          { y: 60, scale: 0.95, opacity: 0, filter: 'blur(8px)' },
+          { y: 0, scale: 1, opacity: 1, filter: 'blur(0px)', duration: 0.9, ease: 'power3.out',
+            scrollTrigger: { trigger: label, start: 'top 85%', end: 'top 40%' }
           }
         )
       }
 
       if (title) {
         gsap.fromTo(title,
-          { y: 60, opacity: 0 },
-          { y: 0, opacity: 1, duration: 0.8, ease: 'power3.out',
-            scrollTrigger: { trigger: title, start: 'top bottom', end: 'top 75%', scrub: 1 }
+          { y: 60, scale: 0.95, opacity: 0, filter: 'blur(8px)' },
+          { y: 0, scale: 1, opacity: 1, filter: 'blur(0px)', duration: 0.9, ease: 'power3.out',
+            scrollTrigger: { trigger: title, start: 'top 85%', end: 'top 40%' }
           }
         )
       }

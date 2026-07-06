@@ -581,11 +581,11 @@ img { max-width: 100%; height: auto; display: block; }
   margin: 0 auto;
   position: relative;
   opacity: 0;
-  background: #000000;
+  background: transparent;
 }
 
 .hero-logo-3d canvas {
-  background: #000 !important;
+  background: transparent !important;
 }
 
 .hero-logo-3d.canvas-ready::after {
@@ -717,6 +717,7 @@ img { max-width: 100%; height: auto; display: block; }
 
 .services .container {
   max-width: 1400px;
+  overflow: hidden;
 }
 
 .services-grid {
@@ -1122,6 +1123,7 @@ img { max-width: 100%; height: auto; display: block; }
 
 .process .container {
   max-width: 1400px;
+  overflow: hidden;
 }
 
 .process-stack {
@@ -2261,14 +2263,15 @@ img { max-width: 100%; height: auto; display: block; }
     grid-template-columns: 1fr;
     gap: 1rem;
   }
+
   .service-card { padding: 32px 24px; border-color: rgba(0,222,255,0.25); }
+  .service-btn:active .service-btn_bg { background-color: #01030e; }
   .text-roll-line { white-space: normal; }
   .process-card-pin { position: static; }
   .process-card { border-color: rgba(0,222,255,0.25); }
   .process-card-body { padding: 32px 24px; }
   .process-stack { gap: 8vh; padding-top: 10px; }
   .process { padding-top: 10px; }
-  .section-title { margin-bottom: 40px; }
   .hero-video-bg video { width: 450px; height: 450px; }
   .hero-video-bg .video-bl { left: -150px; bottom: -150px; }
   .hero-video-bg .video-tr { right: -150px; top: -150px; }
@@ -2294,7 +2297,8 @@ img { max-width: 100%; height: auto; display: block; }
   .services { padding: 60px 0 20px; }
   .process { padding: 20px 0 60px; }
   .cta-section { padding: 60px 0; }
-  .section-label { margin-bottom: 6px; }
+  .section-label { margin-bottom: 12px; }
+
   .hero-headline-dynamic-wrapper { transform: translateX(0); }
   .portfolio-card-body { padding: 16px; }
   .service-page-card { padding: 20px 16px; gap: 20px; }
