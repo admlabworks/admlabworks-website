@@ -142,7 +142,7 @@ export default function Process() {
           <div key={i} className="process-card-pin" style={{ '--i': i, zIndex: i + 1 } as React.CSSProperties}>
             <article className="process-card">
               <div className="process-card-media">
-                <img src={step.img} alt={step.alt} loading="lazy" />
+                <img src={step.img} alt={step.alt} loading="lazy" decoding="async" />
               </div>
               <div className="process-card-body">
                 <span className="process-step-num">

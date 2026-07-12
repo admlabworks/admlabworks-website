@@ -211,6 +211,8 @@ export default function ImageDistortion({
     <div
       ref={containerRef}
       className="distortion-wrap"
-    />
+    >
+      <img src={imageSrc} alt="" className="distortion-fallback" />
+    </div>
   )
 }

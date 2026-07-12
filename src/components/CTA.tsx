@@ -35,7 +35,9 @@ export default function CTA() {
       const prev = current
       current = (current + 1) % children.length
       children[prev].style.opacity = '0'
+      children[prev].style.zIndex = '0'
       children[current].style.opacity = '1'
+      children[current].style.zIndex = '1'
     }, 3000)
 
     return () => clearInterval(interval)
@@ -61,6 +63,7 @@ export default function CTA() {
         <div className="cta-video-wrap">
           <video className="cta-video" autoPlay muted loop playsInline>
             <source src="https://res.cloudinary.com/dqeflf8z7/video/upload/v1781316546/logo-anim_e3qdtl.webm" type="video/webm" />
+            <source src="https://res.cloudinary.com/dqeflf8z7/video/upload/v1781316546/logo-anim_e3qdtl.mp4" type="video/mp4" />
           </video>
         </div>
         <div className="cta-content">

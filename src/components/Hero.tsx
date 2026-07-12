@@ -25,9 +25,11 @@ export default function Hero() {
       <div className="hero-video-bg">
         <video className="video-bl" autoPlay muted loop playsInline crossOrigin="anonymous" preload="auto">
           <source src="https://res.cloudinary.com/dqeflf8z7/video/upload/v1781316546/logo-anim_e3qdtl.webm" type="video/webm" />
+          <source src="https://res.cloudinary.com/dqeflf8z7/video/upload/v1781316546/logo-anim_e3qdtl.mp4" type="video/mp4" />
         </video>
         <video className="video-tr" autoPlay muted loop playsInline crossOrigin="anonymous" preload="auto">
           <source src="https://res.cloudinary.com/dqeflf8z7/video/upload/v1781316546/logo-anim_e3qdtl.webm" type="video/webm" />
+          <source src="https://res.cloudinary.com/dqeflf8z7/video/upload/v1781316546/logo-anim_e3qdtl.mp4" type="video/mp4" />
         </video>
       </div>
       <div className="hero-overlay" />

@@ -106,11 +106,13 @@ export default function ServicesPage() {
         <div className="portfolio-bg-video portfolio-bg-bl">
           <video autoPlay muted loop playsInline>
             <source src="https://res.cloudinary.com/dqeflf8z7/video/upload/v1781316546/logo-anim_e3qdtl.webm" type="video/webm" />
+            <source src="https://res.cloudinary.com/dqeflf8z7/video/upload/v1781316546/logo-anim_e3qdtl.mp4" type="video/mp4" />
           </video>
         </div>
         <div className="portfolio-bg-video portfolio-bg-tr">
           <video autoPlay muted loop playsInline>
             <source src="https://res.cloudinary.com/dqeflf8z7/video/upload/v1781316546/logo-anim_e3qdtl.webm" type="video/webm" />
+            <source src="https://res.cloudinary.com/dqeflf8z7/video/upload/v1781316546/logo-anim_e3qdtl.mp4" type="video/mp4" />
           </video>
         </div>
 
@@ -155,7 +157,7 @@ export default function ServicesPage() {
                   </div>
                 </div>
                 <div className="service-page-card-img">
-                  <img src={s.img} alt={s.imgAlt} loading="lazy" />
+                  <img src={s.img} alt={s.imgAlt} loading="lazy" decoding="async" />
                 </div>
               </div>
             </div>

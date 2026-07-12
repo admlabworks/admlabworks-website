@@ -63,11 +63,13 @@ export default function PortfolioPage() {
         <div className="portfolio-bg-video portfolio-bg-bl">
           <video autoPlay muted loop playsInline>
             <source src="https://res.cloudinary.com/dqeflf8z7/video/upload/v1781316546/logo-anim_e3qdtl.webm" type="video/webm" />
+            <source src="https://res.cloudinary.com/dqeflf8z7/video/upload/v1781316546/logo-anim_e3qdtl.mp4" type="video/mp4" />
           </video>
         </div>
         <div className="portfolio-bg-video portfolio-bg-tr">
           <video autoPlay muted loop playsInline>
             <source src="https://res.cloudinary.com/dqeflf8z7/video/upload/v1781316546/logo-anim_e3qdtl.webm" type="video/webm" />
+            <source src="https://res.cloudinary.com/dqeflf8z7/video/upload/v1781316546/logo-anim_e3qdtl.mp4" type="video/mp4" />
           </video>
         </div>
 
@@ -106,7 +108,7 @@ export default function PortfolioPage() {
               filteredProjects.map((p, i) => (
                 <a key={i} href={p.link} target="_blank" rel="noopener noreferrer" className="portfolio-card">
                   <div className="portfolio-card-img">
-                    <img src={p.img} alt={p.cat} loading="lazy" />
+                    <img src={p.img} alt={p.cat} loading="lazy" decoding="async" />
                   </div>
                   <div className="portfolio-card-body">
                     <span className="portfolio-card-cat">{p.cat}</span>
