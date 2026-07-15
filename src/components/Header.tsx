@@ -1,6 +1,13 @@
 'use client'
 
+import { useEffect } from 'react'
+
 export default function Header({ onMenuOpen }: { onMenuOpen: () => void }) {
+  useEffect(() => {
+    if (/android/i.test(navigator.userAgent)) {
+      document.documentElement.dataset.android = 'true'
+    }
+  }, [])
   return (
     <>
       {/* ====== DESKTOP HEADER ====== */}

@@ -389,6 +389,10 @@ img { max-width: 100%; height: auto; display: block; }
   pointer-events: auto;
 }
 
+html[data-android="true"] .mobile-header-inner {
+  background: rgba(0, 0, 0, 0.5);
+}
+
 .mobile-header-inner .header-logo img {
   width: 36px;
 }
