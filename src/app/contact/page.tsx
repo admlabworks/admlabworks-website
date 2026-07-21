@@ -1,23 +1,78 @@
 'use client'
 
-import { useEffect, useState } from 'react'
+import { useEffect, useState, useCallback } from 'react'
+import { AnimatePresence, motion } from 'framer-motion'
 import CTA from '@/components/CTA'
 import { usePreloaderDone } from '@/context/PreloaderContext'
 
-const serviceOptions = [
-  { value: '', label: 'Choose your service *' },
-  { value: 'wordpress-template', label: 'WordPress Site (3 Templates)' },
-  { value: 'wordpress-custom', label: 'WordPress Site (Custom)' },
-  { value: 'figma-uxui', label: 'Figma Mockup (UX/UI)' },
-  { value: 'logo-design', label: 'Logo Creation' },
-  { value: 'visual-creation', label: 'Visual Creation' },
-  { value: 'graphic-charter', label: 'Complete Graphic Charter' },
-  { value: 'motion-2d', label: 'Motion Design 2D' },
-  { value: 'motion-3d', label: 'Motion Design 3D' },
+const services = ['Logo Design', 'Brand Identity', 'Web Design', 'Motion Design', 'Video Editing', 'Graphic Design']
+const budgets = ['$100 - $500', '$500 - $1,000', '$1,000 - $5,000', '$5,000+']
+
+const serviceOptions: Record<string, string[]> = {
+  'Logo Design': ['Icon Mark', 'Emblem', 'Mascot', 'Wordmark', 'Lettermark'],
+  'Brand Identity': ['Visual Identity', 'Brand Guidelines', 'Brand Strategy', 'Full Rebrand'],
+  'Web Design': ['Landing Page', 'Multi-page Website', 'E-commerce', 'Blog / CMS'],
+  'Motion Design': ['2D Animation', '3D Animation', 'Explainer Video', 'Motion Graphics', 'Title Sequence'],
+  'Video Editing': ['Short-form (Reels/TikTok)', 'Long-form (YouTube)', 'Documentary', 'Commercial / Ad', 'Event Highlights'],
+  'Graphic Design': ['Print Design', 'Digital Design', 'Packaging', 'Social Media', 'Typography / Poster'],
+}
+
+const colorPalette = [
+  '#000000', '#FFFFFF', '#FF0000', '#FF4D4D', '#FF6B35', '#FFA500',
+  '#FFD700', '#FFEB3B', '#ADFF2F', '#00CC66', '#00A86B', '#00CED1',
+  '#00BFFF', '#0077FF', '#0044FF', '#3D00FF', '#7B2FBE', '#CC00FF',
+  '#FF00FF', '#FF69B4', '#8B4513', '#D2691E', '#C0C0C0', '#808080',
 ]
+
+type Screen =
+  | 'greeting'
+  | 'contact_form'
+  | 'quote_services'
+  | 'quote_budget'
+  | 'quote_details'
+  | 'quote_duration'
+  | 'quote_brand'
+  | 'quote_colors'
+  | 'quote_desc'
+  | 'quote_contact'
+  | 'success'
+
+function getGreeting() {
+  try {
+    const tz = Intl.DateTimeFormat().resolvedOptions().timeZone || 'UTC'
+    const city = tz.split('/').pop()?.replaceAll('_', ' ') || 'your area'
+    let country = ''
+    try {
+      const locale = new Intl.Locale(navigator.languages?.[0] || 'en-US')
+      if ('region' in locale) country = new Intl.DisplayNames([(locale as any).baseName], { type: 'region' }).of((locale as any).region) || ''
+    } catch {}
+    const hour = parseInt(new Intl.DateTimeFormat([], { timeZone: tz, hour: 'numeric', hour12: false }).format(new Date()))
+    const timeOfDay = hour < 12 ? 'morning' : 'afternoon'
+    return { city, country: country || 'your region', timeOfDay }
+  } catch {
+    return { city: 'your area', country: 'your region', timeOfDay: 'day' }
+  }
+}
+
+const fade = { initial: { opacity: 0 }, animate: { opacity: 1, transition: { duration: 0.3 } }, exit: { opacity: 0, transition: { duration: 0.2 } } }
 
 export default function ContactPage() {
   const { isPreloaderDone } = usePreloaderDone()
+  const [screen, setScreen] = useState<Screen>('greeting')
+  const [greeting, setGreeting] = useState({ city: '', country: '', timeOfDay: 'day' })
+  const [servicesSelected, setServicesSelected] = useState<string[]>([])
+  const [serviceDetails, setServiceDetails] = useState<Record<string, string>>({})
+  const [budget, setBudget] = useState('')
+  const [brandName, setBrandName] = useState('')
+  const [colorsSelected, setColorsSelected] = useState<string[]>([])
+  const [briefDesc, setBriefDesc] = useState('')
+  const [videoDuration, setVideoDuration] = useState('')
+  const [form, setForm] = useState({ name: '', email: '', phone: '', message: '' })
+  const [submitting, setSubmitting] = useState(false)
+  const [error, setError] = useState('')
+  const [serviceError, setServiceError] = useState('')
+
+  useEffect(() => { setGreeting(getGreeting()) }, [])
 
   useEffect(() => {
     if (!isPreloaderDone) return
@@ -25,61 +80,96 @@ export default function ContactPage() {
       const gsap = (await import('gsap')).default
       const { ScrollTrigger } = await import('gsap/ScrollTrigger')
       gsap.registerPlugin(ScrollTrigger)
-
       gsap.fromTo('.breadcrumb', { y: 20, opacity: 0 }, { y: 0, opacity: 1, duration: 0.8, ease: 'power3.out', delay: 0.3 })
       gsap.fromTo('.portfolio-title', { y: 40, opacity: 0 }, { y: 0, opacity: 1, duration: 0.8, ease: 'power3.out', delay: 0.4 })
       gsap.fromTo('.hero-anchor-link', { y: 20, opacity: 0 }, { y: 0, opacity: 1, duration: 0.6, ease: 'power3.out', stagger: 0.08, delay: 0.5 })
-
-      document.querySelectorAll('.contact-row').forEach((el, i) => {
-        gsap.fromTo(el,
-          { y: 60, opacity: 0 },
-          {
-            y: 0, opacity: 1, duration: 0.8, ease: 'power3.out', delay: 0.2 + i * 0.15,
-            scrollTrigger: { trigger: el, start: 'top 85%', toggleActions: 'play none none none' }
-          }
-        )
-      })
+      gsap.fromTo('.contact-step-label', { y: 20, opacity: 0 }, { y: 0, opacity: 1, duration: 0.8, ease: 'power3.out', delay: 0.6 })
+      gsap.fromTo('.contact-large-text', { y: 30, opacity: 0 }, { y: 0, opacity: 1, duration: 0.8, ease: 'power3.out', delay: 0.7 })
+      gsap.fromTo('.wizard-container', { y: 40, opacity: 0 }, { y: 0, opacity: 1, duration: 0.8, ease: 'power3.out', delay: 0.8 })
     }
     initAnimations()
   }, [isPreloaderDone])
 
-  const [formData, setFormData] = useState({
-    firstName: '',
-    lastName: '',
-    company: '',
-    email: '',
-    service: '',
-    message: '',
-    privacy: false,
-    terms: false,
-  })
-  const [submitted, setSubmitted] = useState(false)
-  const [error, setError] = useState('')
+  const resetWizard = useCallback(() => {
+    setScreen('greeting')
+    setServicesSelected([])
+    setServiceDetails({})
+    setBudget('')
+    setBrandName('')
+    setColorsSelected([])
+    setBriefDesc('')
+    setVideoDuration('')
+    setForm({ name: '', email: '', phone: '', message: '' })
+    setError('')
+    setServiceError('')
+  }, [])
 
-  const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>) => {
-    const { name, value, type } = e.target
-    const checked = type === 'checkbox' ? (e.target as HTMLInputElement).checked : undefined
-    setFormData(prev => ({ ...prev, [name]: type === 'checkbox' ? checked : value }))
+  const goBack = useCallback(() => {
+    const hasDuration = servicesSelected.some(s => s === 'Video Editing' || s === 'Motion Design')
+    const hasColors = servicesSelected.some(s => s === 'Logo Design' || s === 'Web Design')
+    const backMap: Record<Screen, Screen> = {
+      greeting: 'greeting',
+      contact_form: 'greeting',
+      quote_services: 'greeting',
+      quote_budget: 'quote_services',
+      quote_details: 'quote_budget',
+      quote_duration: 'quote_details',
+      quote_brand: 'quote_details',
+      quote_colors: 'quote_brand',
+      quote_desc: hasDuration ? 'quote_duration' : hasColors ? 'quote_colors' : 'quote_brand',
+      quote_contact: 'quote_desc',
+      success: 'greeting',
+    }
+    if (backMap[screen] === 'greeting') resetWizard()
+    else setScreen(backMap[screen])
+  }, [screen, resetWizard, servicesSelected])
+
+  const toggleService = (s: string) => {
+    setServicesSelected(prev => prev.includes(s) ? prev.filter(x => x !== s) : [...prev, s])
+    setServiceError('')
   }
 
-  const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault()
-    setError('')
+  const toggleColor = (c: string) => {
+    setColorsSelected(prev => prev.includes(c) ? prev.filter(x => x !== c) : [...prev, c])
+  }
 
+  const setServiceDetail = (service: string, value: string) => {
+    setServiceDetails(prev => ({ ...prev, [service]: value }))
+  }
+
+  const handleSubmit = async (category: string) => {
+    setSubmitting(true)
+    setError('')
     try {
+      const body = {
+        firstName: form.name,
+        email: form.email,
+        phone: form.phone,
+        message: form.message,
+        service: servicesSelected.join(', '),
+        serviceDetails: Object.entries(serviceDetails).map(([k, v]) => `${k}: ${v}`).join(', '),
+        budget,
+        brandName,
+        colors: colorsSelected.join(', '),
+        brief: briefDesc,
+        videoDuration,
+        category,
+      }
       const res = await fetch('/api/contact', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(formData),
+        body: JSON.stringify(body),
       })
-      const data = await res.json()
       if (!res.ok) {
+        const data = await res.json().catch(() => ({}))
         setError(data.error || 'Something went wrong.')
         return
       }
-      setSubmitted(true)
+      setScreen('success')
     } catch {
       setError('Network error. Please try again.')
+    } finally {
+      setSubmitting(false)
     }
   }
 
@@ -98,95 +188,266 @@ export default function ContactPage() {
             <source src="https://res.cloudinary.com/dqeflf8z7/video/upload/v1781316546/logo-anim_e3qdtl.mp4" type="video/mp4" />
           </video>
         </div>
-
         <div className="portfolio-spacer" />
-
         <div className="container">
           <nav className="breadcrumb">
             <a href="/">Home</a>
             <span className="breadcrumb-sep">/</span>
             <span>Contact</span>
           </nav>
-
           <h2 className="portfolio-title">Contact</h2>
-
           <div className="contact-hero-buttons">
             <a href="tel:+8801977764295" className="hero-anchor-link">+880 1977 764 295</a>
             <a href="mailto:hello@admlabworks.com" className="hero-anchor-link">hello@admlabworks.com</a>
           </div>
         </div>
-
         <div className="portfolio-spacer" />
         <div className="portfolio-fade-bottom" />
       </section>
 
       <section className="contact-section">
-        <div className="contact-section-inner">
-          <div className="contact-row">
-            <div className="contact-col-text">
-              <h2 className="contact-heading">A need?</h2>
-              <p className="contact-desc">
-                If you have a project or needs in Web Design, Art Direction or Motion Design,
-                don&apos;t hesitate to contact me!<br /><br />
-                We will exchange by email first and later on WhatsApp to facilitate the exchange.
-                I am available at any time.
-              </p>
-              <p className="contact-legal">
-                <em>Processing of personal data</em><br /><br />
-                <em>In accordance with the provisions of articles 38 and following of Law 78-17 of January 6, 1978 relating to data processing, files and freedoms, any user has a right of access, rectification, deletion and opposition to personal data concerning them.</em><br />
-                <em>You may exercise this right by simple request by contacting us with proof of your identity.</em>
-              </p>
-            </div>
-            <div className="contact-col-form">
-              {submitted ? (
-                <div className="contact-success">
-                  <p>Thank you! Your message has been received. I&apos;ll get back to you soon.</p>
+        <h2 className="contact-step-label">Contact</h2>
+        <p className="contact-large-text">
+          Have an inquiry, suggestion, a collaboration offer or even trouble sleeping? Get in <span className="contact-highlight">touch</span> with me now.
+        </p>
+
+        <div className="wizard-container">
+          <AnimatePresence mode="wait">
+
+            {screen === 'greeting' && (
+              <motion.div key="greeting" className="wizard-step" {...fade}>
+                <p className="wizard-greeting">
+                  Hey there! How can I assist you on this {greeting.timeOfDay} in{' '}
+                  <span className="wizard-greeting-highlight">{greeting.city}</span>,{' '}
+                  <span className="wizard-greeting-highlight">{greeting.country}</span>?
+                </p>
+                <div className="wizard-options wizard-options-vertical">
+                  <button className="wizard-option-btn" onClick={() => setScreen('quote_services')}>
+                    <span className="wizard-option-label">Get a Quote</span>
+                    <span className="wizard-option-icon">
+                      <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/></svg>
+                    </span>
+                  </button>
+                  <button className="wizard-option-btn" onClick={() => setScreen('contact_form')}>
+                    <span className="wizard-option-label">Contact Me</span>
+                    <span className="wizard-option-icon">
+                      <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>
+                    </span>
+                  </button>
                 </div>
-              ) : (
-                <form className="contact-form" onSubmit={handleSubmit}>
-                  <div className="contact-field-group">
-                    <input type="text" name="firstName" placeholder="First Name *" value={formData.firstName} onChange={handleChange} required />
-                  </div>
-                  <div className="contact-field-group">
-                    <input type="text" name="lastName" placeholder="Last Name *" value={formData.lastName} onChange={handleChange} required />
-                  </div>
-                  <div className="contact-field-group">
-                    <input type="text" name="company" placeholder="Company / Project Name" value={formData.company} onChange={handleChange} />
-                  </div>
-                  <div className="contact-field-group">
-                    <input type="email" name="email" placeholder="Email *" value={formData.email} onChange={handleChange} required />
-                  </div>
-                  <div className="contact-field-group">
-                    <select name="service" value={formData.service} onChange={handleChange} required>
-                      {serviceOptions.map(opt => (
-                        <option key={opt.value} value={opt.value} disabled={opt.value === ''}>{opt.label}</option>
-                      ))}
-                    </select>
-                  </div>
-                  <div className="contact-field-group">
-                    <textarea name="message" placeholder="Let your imagination speak! *" value={formData.message} onChange={handleChange} required rows={4} />
-                  </div>
+              </motion.div>
+            )}
 
-                  <div className="contact-checkbox">
-                    <label>
-                      <input type="checkbox" name="privacy" checked={formData.privacy} onChange={handleChange} required />
-                      <span className="contact-checkbox-label">I have read and accept the privacy policy *</span>
-                    </label>
+            {screen === 'contact_form' && (
+              <motion.div key="contact-form" className="wizard-step" {...fade}>
+                <h3 className="wizard-step-title">Contact Me</h3>
+                <p className="wizard-step-desc">Give me more details, please!</p>
+                <div className="wizard-form">
+                  <div className="wizard-field">
+                    <input type="text" placeholder="Full Name *" value={form.name} onChange={e => setForm(p => ({ ...p, name: e.target.value }))} />
                   </div>
-                  <div className="contact-checkbox">
-                    <label>
-                      <input type="checkbox" name="terms" checked={formData.terms} onChange={handleChange} required />
-                      <span className="contact-checkbox-label">I have read and accept the terms and conditions *</span>
-                    </label>
+                  <div className="wizard-field">
+                    <input type="email" placeholder="Email *" value={form.email} onChange={e => setForm(p => ({ ...p, email: e.target.value }))} />
                   </div>
+                  <div className="wizard-field">
+                    <textarea placeholder="Your message *" rows={5} value={form.message} onChange={e => setForm(p => ({ ...p, message: e.target.value }))} />
+                  </div>
+                  {error && <p className="wizard-error">{error}</p>}
+                  <div className="wizard-nav-row">
+                    <button className="wizard-back-btn" onClick={goBack}>&larr; Go back</button>
+                    <button
+                      className="wizard-submit-btn"
+                      disabled={submitting || !form.name.trim() || !form.email.trim() || !form.message.trim()}
+                      onClick={() => handleSubmit('Contact Me')}
+                    >
+                      {submitting ? 'Sending...' : 'Submit'}
+                    </button>
+                  </div>
+                </div>
+              </motion.div>
+            )}
 
-                  {error && <p className="contact-form-error">{error}</p>}
+            {screen === 'quote_services' && (
+              <motion.div key="quote-services" className="wizard-step" {...fade}>
+                <h3 className="wizard-step-title">Get a Quote</h3>
+                <p className="wizard-step-desc">What services do you need?</p>
+                <div className="wizard-options wizard-options-grid">
+                  {services.map(s => (
+                    <button key={s} className={`wizard-pill ${servicesSelected.includes(s) ? 'wizard-pill-active' : ''}`} onClick={() => toggleService(s)}>{s}</button>
+                  ))}
+                </div>
+                {serviceError && <p className="wizard-error">{serviceError}</p>}
+                <div className="wizard-nav-row">
+                  <button className="wizard-back-btn" onClick={goBack}>&larr; Go back</button>
+                  <button className="wizard-continue-btn" disabled={servicesSelected.length === 0} onClick={() => {
+                    if (servicesSelected.length === 0) { setServiceError('Please select at least one service.'); return }
+                    setScreen('quote_budget')
+                  }}>Continue &rarr;</button>
+                </div>
+              </motion.div>
+            )}
 
-                  <button type="submit" className="contact-submit">Send</button>
-                </form>
-              )}
-            </div>
-          </div>
+            {screen === 'quote_budget' && (
+              <motion.div key="quote-budget" className="wizard-step" {...fade}>
+                <h3 className="wizard-step-title">Get a Quote</h3>
+                <p className="wizard-step-desc">What&apos;s your budget for this project?</p>
+                <div className="wizard-options wizard-options-grid">
+                  {budgets.map(b => (
+                    <button key={b} className={`wizard-pill ${budget === b ? 'wizard-pill-active' : ''}`} onClick={() => setBudget(b)}>{b}</button>
+                  ))}
+                </div>
+                <div className="wizard-nav-row">
+                  <button className="wizard-back-btn" onClick={goBack}>&larr; Go back</button>
+                  <button className="wizard-continue-btn" disabled={!budget} onClick={() => setScreen('quote_details')}>Continue &rarr;</button>
+                </div>
+              </motion.div>
+            )}
+
+            {screen === 'quote_details' && (
+              <motion.div key="quote-details" className="wizard-step" {...fade}>
+                <h3 className="wizard-step-title">Get a Quote</h3>
+                <p className="wizard-step-desc">Tell me more about what you need.</p>
+                <div className="wizard-service-details">
+                  {servicesSelected.filter(s => serviceOptions[s]).map(s => (
+                    <div key={s} className="wizard-service-detail-group">
+                      <p className="wizard-service-detail-label">{s}</p>
+                      <div className="wizard-options wizard-options-pills">
+                        {serviceOptions[s].map(opt => (
+                          <button
+                            key={opt}
+                            className={`wizard-pill wizard-pill-sm ${serviceDetails[s] === opt ? 'wizard-pill-active' : ''}`}
+                            onClick={() => setServiceDetail(s, opt)}
+                          >{opt}</button>
+                        ))}
+                      </div>
+                    </div>
+                  ))}
+                </div>
+                <div className="wizard-nav-row">
+                  <button className="wizard-back-btn" onClick={goBack}>&larr; Go back</button>
+                  <button className="wizard-continue-btn" onClick={() => {
+                    const needsDuration = servicesSelected.some(s => s === 'Video Editing' || s === 'Motion Design')
+                    const needsBrand = servicesSelected.some(s => s !== 'Video Editing' && s !== 'Motion Design')
+                    if (needsDuration) setScreen('quote_duration')
+                    else if (needsBrand) setScreen('quote_brand')
+                    else setScreen('quote_desc')
+                  }}>Continue &rarr;</button>
+                </div>
+              </motion.div>
+            )}
+
+            {screen === 'quote_duration' && (
+              <motion.div key="quote-duration" className="wizard-step" {...fade}>
+                <h3 className="wizard-step-title">Get a Quote</h3>
+                <p className="wizard-step-desc">What&apos;s the expected duration or length?</p>
+                <div className="wizard-options wizard-options-grid">
+                  {['Under 30 seconds', '30s – 1 minute', '1 – 3 minutes', '3 – 5 minutes', '5 – 10 minutes', '10+ minutes'].map(d => (
+                    <button key={d} className={`wizard-pill ${videoDuration === d ? 'wizard-pill-active' : ''}`} onClick={() => setVideoDuration(d)}>{d}</button>
+                  ))}
+                </div>
+                <div className="wizard-nav-row">
+                  <button className="wizard-back-btn" onClick={goBack}>&larr; Go back</button>
+                  <button className="wizard-continue-btn" disabled={!videoDuration} onClick={() => setScreen('quote_desc')}>Continue &rarr;</button>
+                </div>
+              </motion.div>
+            )}
+
+            {screen === 'quote_brand' && (
+              <motion.div key="quote-brand" className="wizard-step" {...fade}>
+                <h3 className="wizard-step-title">Get a Quote</h3>
+                <p className="wizard-step-desc">What&apos;s your brand name?</p>
+                <div className="wizard-form">
+                  <div className="wizard-field">
+                    <input type="text" placeholder="Brand Name" value={brandName} onChange={e => setBrandName(e.target.value)} />
+                  </div>
+                  <div className="wizard-nav-row">
+                    <button className="wizard-back-btn" onClick={goBack}>&larr; Go back</button>
+                    <button className="wizard-continue-btn" onClick={() => {
+                      const needsColors = servicesSelected.some(s => s === 'Logo Design' || s === 'Web Design')
+                      setScreen(needsColors ? 'quote_colors' : 'quote_desc')
+                    }}>Continue &rarr;</button>
+                  </div>
+                </div>
+              </motion.div>
+            )}
+
+            {screen === 'quote_colors' && (
+              <motion.div key="quote-colors" className="wizard-step" {...fade}>
+                <h3 className="wizard-step-title">Get a Quote</h3>
+                <p className="wizard-step-desc">Select your brand colors.</p>
+                <div className="wizard-colors">
+                  {colorPalette.map(c => (
+                    <button
+                      key={c}
+                      className={`wizard-swatch ${colorsSelected.includes(c) ? 'wizard-swatch-active' : ''}`}
+                      style={{ backgroundColor: c, border: c === '#FFFFFF' ? '2px solid rgba(255,255,255,0.2)' : undefined }}
+                      onClick={() => toggleColor(c)}
+                    >
+                      {colorsSelected.includes(c) && <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke={c === '#000000' || c === '#808080' ? '#fff' : '#000'} strokeWidth="3"><polyline points="20 6 9 17 4 12"/></svg>}
+                    </button>
+                  ))}
+                </div>
+                <div className="wizard-nav-row">
+                  <button className="wizard-back-btn" onClick={goBack}>&larr; Go back</button>
+                  <button className="wizard-continue-btn" onClick={() => setScreen('quote_desc')}>Continue &rarr;</button>
+                </div>
+              </motion.div>
+            )}
+
+            {screen === 'quote_desc' && (
+              <motion.div key="quote-desc" className="wizard-step" {...fade}>
+                <h3 className="wizard-step-title">Get a Quote</h3>
+                <p className="wizard-step-desc">Describe your project, goals, and any references.</p>
+                <div className="wizard-form">
+                  <div className="wizard-field">
+                    <textarea placeholder="Tell me about your project..." rows={7} value={briefDesc} onChange={e => setBriefDesc(e.target.value)} />
+                  </div>
+                  <div className="wizard-nav-row">
+                    <button className="wizard-back-btn" onClick={goBack}>&larr; Go back</button>
+                    <button className="wizard-continue-btn" onClick={() => setScreen('quote_contact')}>Continue &rarr;</button>
+                  </div>
+                </div>
+              </motion.div>
+            )}
+
+            {screen === 'quote_contact' && (
+              <motion.div key="quote-contact" className="wizard-step" {...fade}>
+                <h3 className="wizard-step-title">Get a Quote</h3>
+                <p className="wizard-step-desc">Almost done! Fill in your details.</p>
+                <div className="wizard-form">
+                  <div className="wizard-field">
+                    <input type="text" placeholder="Full Name *" value={form.name} onChange={e => setForm(p => ({ ...p, name: e.target.value }))} />
+                  </div>
+                  <div className="wizard-field">
+                    <input type="email" placeholder="Email *" value={form.email} onChange={e => setForm(p => ({ ...p, email: e.target.value }))} />
+                  </div>
+                  <div className="wizard-field">
+                    <input type="tel" placeholder="Phone (optional)" value={form.phone} onChange={e => setForm(p => ({ ...p, phone: e.target.value }))} />
+                  </div>
+                  {error && <p className="wizard-error">{error}</p>}
+                  <div className="wizard-nav-row">
+                    <button className="wizard-back-btn" onClick={goBack}>&larr; Go back</button>
+                    <button
+                      className="wizard-submit-btn"
+                      disabled={submitting || !form.name.trim() || !form.email.trim()}
+                      onClick={() => handleSubmit('Quote')}
+                    >
+                      {submitting ? 'Sending...' : 'Submit'}
+                    </button>
+                  </div>
+                </div>
+              </motion.div>
+            )}
+
+            {screen === 'success' && (
+              <motion.div key="success" className="wizard-step wizard-success" {...fade}>
+                <h3 className="wizard-step-title">Thank you!</h3>
+                <p className="wizard-step-desc">Your submission has been received. I&apos;ll get back to you soon.</p>
+                <button className="wizard-back-btn" onClick={resetWizard}>&larr; Go back</button>
+              </motion.div>
+            )}
+
+          </AnimatePresence>
         </div>
       </section>
 

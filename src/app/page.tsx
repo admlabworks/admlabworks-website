@@ -4,6 +4,7 @@ import { useEffect } from 'react'
 import Hero from '@/components/Hero'
 import Services from '@/components/Services'
 import Process from '@/components/Process'
+import HomeCTA from '@/components/HomeCTA'
 import CTA from '@/components/CTA'
 import { usePreloaderDone } from '@/context/PreloaderContext'
 
@@ -64,6 +65,7 @@ export default function Home() {
       <Hero />
       <Services />
       <Process />
+      <HomeCTA />
       <CTA />
     </main>
   )
