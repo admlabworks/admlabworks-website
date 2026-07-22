@@ -43,8 +43,10 @@ type Screen =
   | 'quote_contact'
   | 'success'
 
-function getTimeOfDay() {
-  const hour = parseInt(new Intl.DateTimeFormat([], { hour: 'numeric', hour12: false }).format(new Date()))
+function getTimeOfDay(timezone?: string) {
+  const opts: Intl.DateTimeFormatOptions = { hour: 'numeric', hour12: false }
+  if (timezone) opts.timeZone = timezone
+  const hour = parseInt(new Intl.DateTimeFormat([], opts).format(new Date()))
   if (hour < 6) return 'night'
   if (hour < 12) return 'morning'
   if (hour < 17) return 'afternoon'
@@ -82,22 +84,19 @@ export default function ContactPage() {
     setGreeting(getGreeting())
     async function fetchGeo() {
       try {
-        let data: any = null
-        try {
-          const res = await fetch('https://ipapi.co/json/')
-          data = await res.json()
-        } catch {}
-        if (!data?.city) {
-          try {
-            const res = await fetch('https://ip-api.com/json/')
-            data = await res.json()
-          } catch {}
-        }
-        if (data?.city) {
+        const res = await fetch('https://ipinfo.io/json')
+        const data = await res.json()
+        if (data.city) {
+          let countryName = data.country || ''
+          if (countryName.length === 2) {
+            try {
+              countryName = new Intl.DisplayNames(['en'], { type: 'region' }).of(countryName) || countryName
+            } catch {}
+          }
           setGreeting({
             city: data.city,
-            country: data.country_name || data.country || 'your region',
-            timeOfDay: getTimeOfDay(),
+            country: countryName || 'your region',
+            timeOfDay: getTimeOfDay(data.timezone),
           })
         }
       } catch {}
@@ -123,7 +122,6 @@ export default function ContactPage() {
   useEffect(() => {
     if (screen === 'success') return
     let cancelled = false
-    let splitInstance: any = null
 
     async function animateStep() {
       const { default: gsap } = await import('gsap')
@@ -137,50 +135,46 @@ export default function ContactPage() {
       if (screen === 'greeting') {
         const el = document.getElementById('wizard-greeting-text')
         if (el) {
-          splitInstance = new SplitText(el, { type: 'words', wordsClass: 'wizard-greeting-word' })
-          gsap.fromTo(splitInstance.words,
+          const split = new SplitText(el, { type: 'words', wordsClass: 'wizard-greeting-word' })
+          gsap.fromTo(split.words,
             { opacity: 0, y: 12 },
-            { opacity: 1, y: 0, duration: 0.35, stagger: 0.025, ease: 'power2.out', delay: 0.05 }
+            { opacity: 1, y: 0, duration: 0.5, stagger: 0.03, ease: 'power2.out' }
           )
         }
         const btns = step.querySelectorAll('.wizard-greeting-btn')
         gsap.fromTo(btns,
           { y: 20, opacity: 0 },
-          { y: 0, opacity: 1, duration: 0.4, stagger: 0.1, ease: 'power3.out', delay: 0.35 }
+          { y: 0, opacity: 1, duration: 0.5, stagger: 0.12, ease: 'power3.out', delay: 0.3 }
         )
         return
       }
 
       const desc = step.querySelector('.wizard-step-desc')
       if (desc) {
-        splitInstance = new SplitText(desc, { type: 'words', wordsClass: 'wizard-step-word' })
-        gsap.fromTo(splitInstance.words,
+        const split = new SplitText(desc, { type: 'words', wordsClass: 'wizard-step-word' })
+        gsap.fromTo(split.words,
           { y: 20, opacity: 0 },
-          { y: 0, opacity: 1, duration: 0.4, stagger: 0.02, ease: 'power3.out', delay: 0.05 }
+          { y: 0, opacity: 1, duration: 0.5, stagger: 0.03, ease: 'power3.out' }
         )
       }
 
       const children = step.querySelectorAll('.wizard-options, .wizard-form, .wizard-colors, .wizard-service-details')
       gsap.fromTo(children,
         { y: 20, opacity: 0 },
-        { y: 0, opacity: 1, duration: 0.4, stagger: 0.08, ease: 'power3.out', delay: 0.2 }
+        { y: 0, opacity: 1, duration: 0.5, stagger: 0.1, ease: 'power3.out', delay: 0.15 }
       )
 
       const nav = step.querySelector('.wizard-nav-row')
       if (nav) {
         gsap.fromTo(nav,
           { y: 20, opacity: 0 },
-          { y: 0, opacity: 1, duration: 0.3, ease: 'power3.out', delay: 0.35 }
+          { y: 0, opacity: 1, duration: 0.4, ease: 'power3.out', delay: 0.25 }
         )
       }
     }
 
-    const timer = setTimeout(animateStep, 350)
-    return () => {
-      cancelled = true
-      clearTimeout(timer)
-      if (splitInstance) splitInstance.revert()
-    }
+    const timer = setTimeout(animateStep, 250)
+    return () => { cancelled = true; clearTimeout(timer) }
   }, [screen])
 
   const resetWizard = useCallback(() => {
