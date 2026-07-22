@@ -5,6 +5,12 @@ import { AnimatePresence, motion } from 'framer-motion'
 import CTA from '@/components/CTA'
 import { usePreloaderDone } from '@/context/PreloaderContext'
 
+const ArrowSVG = ({ className }: { className?: string }) => (
+  <svg width="100%" viewBox="0 0 16 14" fill="none" className={className}>
+    <path d="M7.7523 12.5078L2 6.75353L7.7523 0.99921M15.9699 6.75353L2.41088 6.75351" stroke="currentColor" strokeWidth="1.64351" />
+  </svg>
+)
+
 const services = ['Logo Design', 'Brand Identity', 'Web Design', 'Motion Design', 'Video Editing', 'Graphic Design']
 const budgets = ['$100 - $500', '$500 - $1,000', '$1,000 - $5,000', '$5,000+']
 
@@ -37,18 +43,18 @@ type Screen =
   | 'quote_contact'
   | 'success'
 
+function getTimeOfDay() {
+  const hour = parseInt(new Intl.DateTimeFormat([], { hour: 'numeric', hour12: false }).format(new Date()))
+  if (hour < 6) return 'night'
+  if (hour < 12) return 'morning'
+  if (hour < 17) return 'afternoon'
+  if (hour < 21) return 'evening'
+  return 'night'
+}
+
 function getGreeting() {
   try {
-    const tz = Intl.DateTimeFormat().resolvedOptions().timeZone || 'UTC'
-    const city = tz.split('/').pop()?.replaceAll('_', ' ') || 'your area'
-    let country = ''
-    try {
-      const locale = new Intl.Locale(navigator.languages?.[0] || 'en-US')
-      if ('region' in locale) country = new Intl.DisplayNames([(locale as any).baseName], { type: 'region' }).of((locale as any).region) || ''
-    } catch {}
-    const hour = parseInt(new Intl.DateTimeFormat([], { timeZone: tz, hour: 'numeric', hour12: false }).format(new Date()))
-    const timeOfDay = hour < 12 ? 'morning' : 'afternoon'
-    return { city, country: country || 'your region', timeOfDay }
+    return { city: 'your area', country: 'your region', timeOfDay: getTimeOfDay() }
   } catch {
     return { city: 'your area', country: 'your region', timeOfDay: 'day' }
   }
@@ -72,7 +78,32 @@ export default function ContactPage() {
   const [error, setError] = useState('')
   const [serviceError, setServiceError] = useState('')
 
-  useEffect(() => { setGreeting(getGreeting()) }, [])
+  useEffect(() => {
+    setGreeting(getGreeting())
+    async function fetchGeo() {
+      try {
+        let data: any = null
+        try {
+          const res = await fetch('https://ipapi.co/json/')
+          data = await res.json()
+        } catch {}
+        if (!data?.city) {
+          try {
+            const res = await fetch('https://ip-api.com/json/')
+            data = await res.json()
+          } catch {}
+        }
+        if (data?.city) {
+          setGreeting({
+            city: data.city,
+            country: data.country_name || data.country || 'your region',
+            timeOfDay: getTimeOfDay(),
+          })
+        }
+      } catch {}
+    }
+    fetchGeo()
+  }, [])
 
   useEffect(() => {
     if (!isPreloaderDone) return
@@ -83,12 +114,74 @@ export default function ContactPage() {
       gsap.fromTo('.breadcrumb', { y: 20, opacity: 0 }, { y: 0, opacity: 1, duration: 0.8, ease: 'power3.out', delay: 0.3 })
       gsap.fromTo('.portfolio-title', { y: 40, opacity: 0 }, { y: 0, opacity: 1, duration: 0.8, ease: 'power3.out', delay: 0.4 })
       gsap.fromTo('.hero-anchor-link', { y: 20, opacity: 0 }, { y: 0, opacity: 1, duration: 0.6, ease: 'power3.out', stagger: 0.08, delay: 0.5 })
-      gsap.fromTo('.contact-step-label', { y: 20, opacity: 0 }, { y: 0, opacity: 1, duration: 0.8, ease: 'power3.out', delay: 0.6 })
-      gsap.fromTo('.contact-large-text', { y: 30, opacity: 0 }, { y: 0, opacity: 1, duration: 0.8, ease: 'power3.out', delay: 0.7 })
-      gsap.fromTo('.wizard-container', { y: 40, opacity: 0 }, { y: 0, opacity: 1, duration: 0.8, ease: 'power3.out', delay: 0.8 })
+      gsap.fromTo('.contact-large-text', { y: 30, opacity: 0 }, { y: 0, opacity: 1, duration: 0.8, ease: 'power3.out', delay: 0.6 })
+      gsap.fromTo('.wizard-container', { y: 40, opacity: 0 }, { y: 0, opacity: 1, duration: 0.8, ease: 'power3.out', delay: 0.7 })
     }
     initAnimations()
   }, [isPreloaderDone])
+
+  useEffect(() => {
+    if (screen === 'success') return
+    let cancelled = false
+    let splitInstance: any = null
+
+    async function animateStep() {
+      const { default: gsap } = await import('gsap')
+      const { SplitText } = await import('gsap/SplitText')
+      gsap.registerPlugin(SplitText)
+
+      const steps = document.querySelectorAll('.wizard-step')
+      const step = steps[steps.length - 1]
+      if (!step || cancelled) return
+
+      if (screen === 'greeting') {
+        const el = document.getElementById('wizard-greeting-text')
+        if (el) {
+          splitInstance = new SplitText(el, { type: 'words', wordsClass: 'wizard-greeting-word' })
+          gsap.fromTo(splitInstance.words,
+            { opacity: 0, y: 12 },
+            { opacity: 1, y: 0, duration: 0.35, stagger: 0.025, ease: 'power2.out', delay: 0.05 }
+          )
+        }
+        const btns = step.querySelectorAll('.wizard-greeting-btn')
+        gsap.fromTo(btns,
+          { y: 20, opacity: 0 },
+          { y: 0, opacity: 1, duration: 0.4, stagger: 0.1, ease: 'power3.out', delay: 0.35 }
+        )
+        return
+      }
+
+      const desc = step.querySelector('.wizard-step-desc')
+      if (desc) {
+        splitInstance = new SplitText(desc, { type: 'words', wordsClass: 'wizard-step-word' })
+        gsap.fromTo(splitInstance.words,
+          { y: 20, opacity: 0 },
+          { y: 0, opacity: 1, duration: 0.4, stagger: 0.02, ease: 'power3.out', delay: 0.05 }
+        )
+      }
+
+      const children = step.querySelectorAll('.wizard-options, .wizard-form, .wizard-colors, .wizard-service-details')
+      gsap.fromTo(children,
+        { y: 20, opacity: 0 },
+        { y: 0, opacity: 1, duration: 0.4, stagger: 0.08, ease: 'power3.out', delay: 0.2 }
+      )
+
+      const nav = step.querySelector('.wizard-nav-row')
+      if (nav) {
+        gsap.fromTo(nav,
+          { y: 20, opacity: 0 },
+          { y: 0, opacity: 1, duration: 0.3, ease: 'power3.out', delay: 0.35 }
+        )
+      }
+    }
+
+    const timer = setTimeout(animateStep, 350)
+    return () => {
+      cancelled = true
+      clearTimeout(timer)
+      if (splitInstance) splitInstance.revert()
+    }
+  }, [screen])
 
   const resetWizard = useCallback(() => {
     setScreen('greeting')
@@ -206,34 +299,29 @@ export default function ContactPage() {
       </section>
 
       <section className="contact-section">
-        <h2 className="contact-step-label">Contact</h2>
         <p className="contact-large-text">
-          Have an inquiry, suggestion, a collaboration offer or even trouble sleeping? Get in <span className="contact-highlight">touch</span> with me now.
+          Have an inquiry, suggestion, a collaboration offer <br />or even trouble sleeping?<span className="contact-highlight"> Get in touch</span> with me now.
         </p>
 
         <div className="wizard-container">
           <AnimatePresence mode="wait">
 
             {screen === 'greeting' && (
-              <motion.div key="greeting" className="wizard-step" {...fade}>
-                <p className="wizard-greeting">
+              <motion.div
+                key="greeting"
+                className="wizard-step"
+                initial={{ opacity: 0 }}
+                animate={{ opacity: 1, transition: { duration: 0.3 } }}
+                exit={{ opacity: 0, scale: 0.96, transition: { duration: 0.2 } }}
+              >
+                <p className="wizard-greeting" id="wizard-greeting-text">
                   Hey there! How can I assist you on this {greeting.timeOfDay} in{' '}
                   <span className="wizard-greeting-highlight">{greeting.city}</span>,{' '}
                   <span className="wizard-greeting-highlight">{greeting.country}</span>?
                 </p>
                 <div className="wizard-options wizard-options-vertical">
-                  <button className="wizard-option-btn" onClick={() => setScreen('quote_services')}>
-                    <span className="wizard-option-label">Get a Quote</span>
-                    <span className="wizard-option-icon">
-                      <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/></svg>
-                    </span>
-                  </button>
-                  <button className="wizard-option-btn" onClick={() => setScreen('contact_form')}>
-                    <span className="wizard-option-label">Contact Me</span>
-                    <span className="wizard-option-icon">
-                      <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>
-                    </span>
-                  </button>
+                  <button className="wizard-greeting-btn" onClick={() => setScreen('quote_services')}>Get a Quote</button>
+                  <button className="wizard-greeting-btn" onClick={() => setScreen('contact_form')}>Contact Me</button>
                 </div>
               </motion.div>
             )}
@@ -241,7 +329,7 @@ export default function ContactPage() {
             {screen === 'contact_form' && (
               <motion.div key="contact-form" className="wizard-step" {...fade}>
                 <h3 className="wizard-step-title">Contact Me</h3>
-                <p className="wizard-step-desc">Give me more details, please!</p>
+                <p className="wizard-step-desc">Hey there! Give me more details, please!</p>
                 <div className="wizard-form">
                   <div className="wizard-field">
                     <input type="text" placeholder="Full Name *" value={form.name} onChange={e => setForm(p => ({ ...p, name: e.target.value }))} />
@@ -254,13 +342,23 @@ export default function ContactPage() {
                   </div>
                   {error && <p className="wizard-error">{error}</p>}
                   <div className="wizard-nav-row">
-                    <button className="wizard-back-btn" onClick={goBack}>&larr; Go back</button>
+                    <button className="wizard-capsule-btn wizard-capsule-back" onClick={goBack}>
+                      <span className="wizard-capsule-circle">
+                        <span className="wizard-capsule-arrow wizard-capsule-arrow-normal"><ArrowSVG /></span>
+                        <span className="wizard-capsule-arrow wizard-capsule-arrow-hover"><ArrowSVG /></span>
+                      </span>
+                      <span className="wizard-capsule-text">Go back</span>
+                    </button>
                     <button
-                      className="wizard-submit-btn"
+                      className="wizard-capsule-btn wizard-capsule-continue"
                       disabled={submitting || !form.name.trim() || !form.email.trim() || !form.message.trim()}
                       onClick={() => handleSubmit('Contact Me')}
                     >
-                      {submitting ? 'Sending...' : 'Submit'}
+                      <span className="wizard-capsule-text">{submitting ? 'Sending...' : 'Submit'}</span>
+                      <span className="wizard-capsule-circle">
+                        <span className="wizard-capsule-arrow wizard-capsule-arrow-normal"><ArrowSVG /></span>
+                        <span className="wizard-capsule-arrow wizard-capsule-arrow-hover"><ArrowSVG /></span>
+                      </span>
                     </button>
                   </div>
                 </div>
@@ -270,7 +368,7 @@ export default function ContactPage() {
             {screen === 'quote_services' && (
               <motion.div key="quote-services" className="wizard-step" {...fade}>
                 <h3 className="wizard-step-title">Get a Quote</h3>
-                <p className="wizard-step-desc">What services do you need?</p>
+                <p className="wizard-step-desc">Ready to team up? My passion for creative excellence sets me apart. How can I help you?</p>
                 <div className="wizard-options wizard-options-grid">
                   {services.map(s => (
                     <button key={s} className={`wizard-pill ${servicesSelected.includes(s) ? 'wizard-pill-active' : ''}`} onClick={() => toggleService(s)}>{s}</button>
@@ -278,11 +376,23 @@ export default function ContactPage() {
                 </div>
                 {serviceError && <p className="wizard-error">{serviceError}</p>}
                 <div className="wizard-nav-row">
-                  <button className="wizard-back-btn" onClick={goBack}>&larr; Go back</button>
-                  <button className="wizard-continue-btn" disabled={servicesSelected.length === 0} onClick={() => {
+                  <button className="wizard-capsule-btn wizard-capsule-back" onClick={goBack}>
+                    <span className="wizard-capsule-circle">
+                      <span className="wizard-capsule-arrow wizard-capsule-arrow-normal"><ArrowSVG /></span>
+                      <span className="wizard-capsule-arrow wizard-capsule-arrow-hover"><ArrowSVG /></span>
+                    </span>
+                    <span className="wizard-capsule-text">Go back</span>
+                  </button>
+                  <button className="wizard-capsule-btn wizard-capsule-continue" disabled={servicesSelected.length === 0} onClick={() => {
                     if (servicesSelected.length === 0) { setServiceError('Please select at least one service.'); return }
                     setScreen('quote_budget')
-                  }}>Continue &rarr;</button>
+                  }}>
+                    <span className="wizard-capsule-text">Continue</span>
+                    <span className="wizard-capsule-circle">
+                      <span className="wizard-capsule-arrow wizard-capsule-arrow-normal"><ArrowSVG /></span>
+                      <span className="wizard-capsule-arrow wizard-capsule-arrow-hover"><ArrowSVG /></span>
+                    </span>
+                  </button>
                 </div>
               </motion.div>
             )}
@@ -290,15 +400,27 @@ export default function ContactPage() {
             {screen === 'quote_budget' && (
               <motion.div key="quote-budget" className="wizard-step" {...fade}>
                 <h3 className="wizard-step-title">Get a Quote</h3>
-                <p className="wizard-step-desc">What&apos;s your budget for this project?</p>
+                <p className="wizard-step-desc">Things in life may not always be free, right? What&apos;s your budget for this project?</p>
                 <div className="wizard-options wizard-options-grid">
                   {budgets.map(b => (
                     <button key={b} className={`wizard-pill ${budget === b ? 'wizard-pill-active' : ''}`} onClick={() => setBudget(b)}>{b}</button>
                   ))}
                 </div>
                 <div className="wizard-nav-row">
-                  <button className="wizard-back-btn" onClick={goBack}>&larr; Go back</button>
-                  <button className="wizard-continue-btn" disabled={!budget} onClick={() => setScreen('quote_details')}>Continue &rarr;</button>
+                  <button className="wizard-capsule-btn wizard-capsule-back" onClick={goBack}>
+                    <span className="wizard-capsule-circle">
+                      <span className="wizard-capsule-arrow wizard-capsule-arrow-normal"><ArrowSVG /></span>
+                      <span className="wizard-capsule-arrow wizard-capsule-arrow-hover"><ArrowSVG /></span>
+                    </span>
+                    <span className="wizard-capsule-text">Go back</span>
+                  </button>
+                  <button className="wizard-capsule-btn wizard-capsule-continue" disabled={!budget} onClick={() => setScreen('quote_details')}>
+                    <span className="wizard-capsule-text">Continue</span>
+                    <span className="wizard-capsule-circle">
+                      <span className="wizard-capsule-arrow wizard-capsule-arrow-normal"><ArrowSVG /></span>
+                      <span className="wizard-capsule-arrow wizard-capsule-arrow-hover"><ArrowSVG /></span>
+                    </span>
+                  </button>
                 </div>
               </motion.div>
             )}
@@ -306,7 +428,7 @@ export default function ContactPage() {
             {screen === 'quote_details' && (
               <motion.div key="quote-details" className="wizard-step" {...fade}>
                 <h3 className="wizard-step-title">Get a Quote</h3>
-                <p className="wizard-step-desc">Tell me more about what you need.</p>
+                <p className="wizard-step-desc">Let&apos;s dive deeper! Tell me more about what you need.</p>
                 <div className="wizard-service-details">
                   {servicesSelected.filter(s => serviceOptions[s]).map(s => (
                     <div key={s} className="wizard-service-detail-group">
@@ -324,14 +446,26 @@ export default function ContactPage() {
                   ))}
                 </div>
                 <div className="wizard-nav-row">
-                  <button className="wizard-back-btn" onClick={goBack}>&larr; Go back</button>
-                  <button className="wizard-continue-btn" onClick={() => {
+                  <button className="wizard-capsule-btn wizard-capsule-back" onClick={goBack}>
+                    <span className="wizard-capsule-circle">
+                      <span className="wizard-capsule-arrow wizard-capsule-arrow-normal"><ArrowSVG /></span>
+                      <span className="wizard-capsule-arrow wizard-capsule-arrow-hover"><ArrowSVG /></span>
+                    </span>
+                    <span className="wizard-capsule-text">Go back</span>
+                  </button>
+                  <button className="wizard-capsule-btn wizard-capsule-continue" onClick={() => {
                     const needsDuration = servicesSelected.some(s => s === 'Video Editing' || s === 'Motion Design')
                     const needsBrand = servicesSelected.some(s => s !== 'Video Editing' && s !== 'Motion Design')
                     if (needsDuration) setScreen('quote_duration')
                     else if (needsBrand) setScreen('quote_brand')
                     else setScreen('quote_desc')
-                  }}>Continue &rarr;</button>
+                  }}>
+                    <span className="wizard-capsule-text">Continue</span>
+                    <span className="wizard-capsule-circle">
+                      <span className="wizard-capsule-arrow wizard-capsule-arrow-normal"><ArrowSVG /></span>
+                      <span className="wizard-capsule-arrow wizard-capsule-arrow-hover"><ArrowSVG /></span>
+                    </span>
+                  </button>
                 </div>
               </motion.div>
             )}
@@ -339,15 +473,27 @@ export default function ContactPage() {
             {screen === 'quote_duration' && (
               <motion.div key="quote-duration" className="wizard-step" {...fade}>
                 <h3 className="wizard-step-title">Get a Quote</h3>
-                <p className="wizard-step-desc">What&apos;s the expected duration or length?</p>
+                <p className="wizard-step-desc">Time is art! What&apos;s the expected duration or length?</p>
                 <div className="wizard-options wizard-options-grid">
                   {['Under 30 seconds', '30s – 1 minute', '1 – 3 minutes', '3 – 5 minutes', '5 – 10 minutes', '10+ minutes'].map(d => (
                     <button key={d} className={`wizard-pill ${videoDuration === d ? 'wizard-pill-active' : ''}`} onClick={() => setVideoDuration(d)}>{d}</button>
                   ))}
                 </div>
                 <div className="wizard-nav-row">
-                  <button className="wizard-back-btn" onClick={goBack}>&larr; Go back</button>
-                  <button className="wizard-continue-btn" disabled={!videoDuration} onClick={() => setScreen('quote_desc')}>Continue &rarr;</button>
+                  <button className="wizard-capsule-btn wizard-capsule-back" onClick={goBack}>
+                    <span className="wizard-capsule-circle">
+                      <span className="wizard-capsule-arrow wizard-capsule-arrow-normal"><ArrowSVG /></span>
+                      <span className="wizard-capsule-arrow wizard-capsule-arrow-hover"><ArrowSVG /></span>
+                    </span>
+                    <span className="wizard-capsule-text">Go back</span>
+                  </button>
+                  <button className="wizard-capsule-btn wizard-capsule-continue" disabled={!videoDuration} onClick={() => setScreen('quote_desc')}>
+                    <span className="wizard-capsule-text">Continue</span>
+                    <span className="wizard-capsule-circle">
+                      <span className="wizard-capsule-arrow wizard-capsule-arrow-normal"><ArrowSVG /></span>
+                      <span className="wizard-capsule-arrow wizard-capsule-arrow-hover"><ArrowSVG /></span>
+                    </span>
+                  </button>
                 </div>
               </motion.div>
             )}
@@ -355,17 +501,29 @@ export default function ContactPage() {
             {screen === 'quote_brand' && (
               <motion.div key="quote-brand" className="wizard-step" {...fade}>
                 <h3 className="wizard-step-title">Get a Quote</h3>
-                <p className="wizard-step-desc">What&apos;s your brand name?</p>
+                <p className="wizard-step-desc">Every great project starts with a name. What&apos;s your brand name?</p>
                 <div className="wizard-form">
                   <div className="wizard-field">
                     <input type="text" placeholder="Brand Name" value={brandName} onChange={e => setBrandName(e.target.value)} />
                   </div>
                   <div className="wizard-nav-row">
-                    <button className="wizard-back-btn" onClick={goBack}>&larr; Go back</button>
-                    <button className="wizard-continue-btn" onClick={() => {
+                    <button className="wizard-capsule-btn wizard-capsule-back" onClick={goBack}>
+                      <span className="wizard-capsule-circle">
+                        <span className="wizard-capsule-arrow wizard-capsule-arrow-normal"><ArrowSVG /></span>
+                        <span className="wizard-capsule-arrow wizard-capsule-arrow-hover"><ArrowSVG /></span>
+                      </span>
+                      <span className="wizard-capsule-text">Go back</span>
+                    </button>
+                    <button className="wizard-capsule-btn wizard-capsule-continue" onClick={() => {
                       const needsColors = servicesSelected.some(s => s === 'Logo Design' || s === 'Web Design')
                       setScreen(needsColors ? 'quote_colors' : 'quote_desc')
-                    }}>Continue &rarr;</button>
+                    }}>
+                      <span className="wizard-capsule-text">Continue</span>
+                      <span className="wizard-capsule-circle">
+                        <span className="wizard-capsule-arrow wizard-capsule-arrow-normal"><ArrowSVG /></span>
+                        <span className="wizard-capsule-arrow wizard-capsule-arrow-hover"><ArrowSVG /></span>
+                      </span>
+                    </button>
                   </div>
                 </div>
               </motion.div>
@@ -374,7 +532,7 @@ export default function ContactPage() {
             {screen === 'quote_colors' && (
               <motion.div key="quote-colors" className="wizard-step" {...fade}>
                 <h3 className="wizard-step-title">Get a Quote</h3>
-                <p className="wizard-step-desc">Select your brand colors.</p>
+                <p className="wizard-step-desc">Colors speak volumes! Select your brand colors.</p>
                 <div className="wizard-colors">
                   {colorPalette.map(c => (
                     <button
@@ -388,8 +546,20 @@ export default function ContactPage() {
                   ))}
                 </div>
                 <div className="wizard-nav-row">
-                  <button className="wizard-back-btn" onClick={goBack}>&larr; Go back</button>
-                  <button className="wizard-continue-btn" onClick={() => setScreen('quote_desc')}>Continue &rarr;</button>
+                  <button className="wizard-capsule-btn wizard-capsule-back" onClick={goBack}>
+                    <span className="wizard-capsule-circle">
+                      <span className="wizard-capsule-arrow wizard-capsule-arrow-normal"><ArrowSVG /></span>
+                      <span className="wizard-capsule-arrow wizard-capsule-arrow-hover"><ArrowSVG /></span>
+                    </span>
+                    <span className="wizard-capsule-text">Go back</span>
+                  </button>
+                  <button className="wizard-capsule-btn wizard-capsule-continue" onClick={() => setScreen('quote_desc')}>
+                    <span className="wizard-capsule-text">Continue</span>
+                    <span className="wizard-capsule-circle">
+                      <span className="wizard-capsule-arrow wizard-capsule-arrow-normal"><ArrowSVG /></span>
+                      <span className="wizard-capsule-arrow wizard-capsule-arrow-hover"><ArrowSVG /></span>
+                    </span>
+                  </button>
                 </div>
               </motion.div>
             )}
@@ -397,14 +567,26 @@ export default function ContactPage() {
             {screen === 'quote_desc' && (
               <motion.div key="quote-desc" className="wizard-step" {...fade}>
                 <h3 className="wizard-step-title">Get a Quote</h3>
-                <p className="wizard-step-desc">Describe your project, goals, and any references.</p>
+                <p className="wizard-step-desc">Let&apos;s spice it up! Describe your project, goals, and any references.</p>
                 <div className="wizard-form">
                   <div className="wizard-field">
                     <textarea placeholder="Tell me about your project..." rows={7} value={briefDesc} onChange={e => setBriefDesc(e.target.value)} />
                   </div>
                   <div className="wizard-nav-row">
-                    <button className="wizard-back-btn" onClick={goBack}>&larr; Go back</button>
-                    <button className="wizard-continue-btn" onClick={() => setScreen('quote_contact')}>Continue &rarr;</button>
+                    <button className="wizard-capsule-btn wizard-capsule-back" onClick={goBack}>
+                      <span className="wizard-capsule-circle">
+                        <span className="wizard-capsule-arrow wizard-capsule-arrow-normal"><ArrowSVG /></span>
+                        <span className="wizard-capsule-arrow wizard-capsule-arrow-hover"><ArrowSVG /></span>
+                      </span>
+                      <span className="wizard-capsule-text">Go back</span>
+                    </button>
+                    <button className="wizard-capsule-btn wizard-capsule-continue" onClick={() => setScreen('quote_contact')}>
+                      <span className="wizard-capsule-text">Continue</span>
+                      <span className="wizard-capsule-circle">
+                        <span className="wizard-capsule-arrow wizard-capsule-arrow-normal"><ArrowSVG /></span>
+                        <span className="wizard-capsule-arrow wizard-capsule-arrow-hover"><ArrowSVG /></span>
+                      </span>
+                    </button>
                   </div>
                 </div>
               </motion.div>
@@ -413,7 +595,7 @@ export default function ContactPage() {
             {screen === 'quote_contact' && (
               <motion.div key="quote-contact" className="wizard-step" {...fade}>
                 <h3 className="wizard-step-title">Get a Quote</h3>
-                <p className="wizard-step-desc">Almost done! Fill in your details.</p>
+                <p className="wizard-step-desc">Almost there! Fill in your details and let&apos;s get started.</p>
                 <div className="wizard-form">
                   <div className="wizard-field">
                     <input type="text" placeholder="Full Name *" value={form.name} onChange={e => setForm(p => ({ ...p, name: e.target.value }))} />
@@ -426,13 +608,23 @@ export default function ContactPage() {
                   </div>
                   {error && <p className="wizard-error">{error}</p>}
                   <div className="wizard-nav-row">
-                    <button className="wizard-back-btn" onClick={goBack}>&larr; Go back</button>
+                    <button className="wizard-capsule-btn wizard-capsule-back" onClick={goBack}>
+                      <span className="wizard-capsule-circle">
+                        <span className="wizard-capsule-arrow wizard-capsule-arrow-normal"><ArrowSVG /></span>
+                        <span className="wizard-capsule-arrow wizard-capsule-arrow-hover"><ArrowSVG /></span>
+                      </span>
+                      <span className="wizard-capsule-text">Go back</span>
+                    </button>
                     <button
-                      className="wizard-submit-btn"
+                      className="wizard-capsule-btn wizard-capsule-continue"
                       disabled={submitting || !form.name.trim() || !form.email.trim()}
                       onClick={() => handleSubmit('Quote')}
                     >
-                      {submitting ? 'Sending...' : 'Submit'}
+                      <span className="wizard-capsule-text">{submitting ? 'Sending...' : 'Submit'}</span>
+                      <span className="wizard-capsule-circle">
+                        <span className="wizard-capsule-arrow wizard-capsule-arrow-normal"><ArrowSVG /></span>
+                        <span className="wizard-capsule-arrow wizard-capsule-arrow-hover"><ArrowSVG /></span>
+                      </span>
                     </button>
                   </div>
                 </div>
@@ -442,8 +634,14 @@ export default function ContactPage() {
             {screen === 'success' && (
               <motion.div key="success" className="wizard-step wizard-success" {...fade}>
                 <h3 className="wizard-step-title">Thank you!</h3>
-                <p className="wizard-step-desc">Your submission has been received. I&apos;ll get back to you soon.</p>
-                <button className="wizard-back-btn" onClick={resetWizard}>&larr; Go back</button>
+                <p className="wizard-step-desc">Success! Your submission is in. Now relax, and I&apos;ll get back to you soon.</p>
+                <button className="wizard-capsule-btn wizard-capsule-back" onClick={resetWizard}>
+                  <span className="wizard-capsule-circle">
+                    <span className="wizard-capsule-arrow wizard-capsule-arrow-normal"><ArrowSVG /></span>
+                    <span className="wizard-capsule-arrow wizard-capsule-arrow-hover"><ArrowSVG /></span>
+                  </span>
+                  <span className="wizard-capsule-text">Go back</span>
+                </button>
               </motion.div>
             )}
 
