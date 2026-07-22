@@ -1583,14 +1583,6 @@ html[data-android="true"] .mobile-header-inner {
   opacity: 0;
 }
 
-.wizard-step-desc,
-.wizard-form,
-.wizard-colors,
-.wizard-service-details,
-.wizard-nav-row {
-  opacity: 0;
-}
-
 .wizard-greeting-btn,
 .wizard-pill,
 .wizard-continue-btn,
@@ -1606,6 +1598,16 @@ html[data-android="true"] .mobile-header-inner {
   font-weight: 400;
   color: rgba(255,255,255,0.4);
   margin: 0 0 8px;
+}
+
+#wizard-greeting-text,
+.wizard-step-desc,
+.wizard-options,
+.wizard-form,
+.wizard-colors,
+.wizard-service-details,
+.wizard-nav-row {
+  opacity: 0;
 }
 
 .wizard-step-desc {

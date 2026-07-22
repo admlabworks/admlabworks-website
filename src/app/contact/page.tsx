@@ -135,23 +135,31 @@ export default function ContactPage() {
       if (screen === 'greeting') {
         const el = document.getElementById('wizard-greeting-text')
         if (el) {
+          gsap.set(el, { opacity: 0 })
           const split = new SplitText(el, { type: 'words', wordsClass: 'wizard-greeting-word' })
+          gsap.set(el, { opacity: 1 })
           gsap.fromTo(split.words,
             { opacity: 0, y: 12 },
             { opacity: 1, y: 0, duration: 0.5, stagger: 0.03, ease: 'power2.out' }
           )
         }
+        const btnsContainer = step.querySelector('.wizard-options')
+        if (btnsContainer) {
+          gsap.set(btnsContainer, { opacity: 1 })
+        }
         const btns = step.querySelectorAll('.wizard-greeting-btn')
-        gsap.fromTo(btns,
-          { y: 20, opacity: 0 },
-          { y: 0, opacity: 1, duration: 0.5, stagger: 0.12, ease: 'power3.out', delay: 0.3 }
+        gsap.set(btns, { opacity: 0, y: 20 })
+        gsap.to(btns,
+          { opacity: 1, y: 0, duration: 0.5, stagger: 0.12, ease: 'power3.out', delay: 0.3 }
         )
         return
       }
 
       const desc = step.querySelector('.wizard-step-desc')
       if (desc) {
+        gsap.set(desc, { opacity: 0 })
         const split = new SplitText(desc, { type: 'words', wordsClass: 'wizard-step-word' })
+        gsap.set(desc, { opacity: 1 })
         gsap.fromTo(split.words,
           { y: 20, opacity: 0 },
           { y: 0, opacity: 1, duration: 0.5, stagger: 0.03, ease: 'power3.out' }
@@ -159,16 +167,16 @@ export default function ContactPage() {
       }
 
       const children = step.querySelectorAll('.wizard-options, .wizard-form, .wizard-colors, .wizard-service-details')
-      gsap.fromTo(children,
-        { y: 20, opacity: 0 },
-        { y: 0, opacity: 1, duration: 0.5, stagger: 0.1, ease: 'power3.out', delay: 0.15 }
+      gsap.set(children, { opacity: 0, y: 20 })
+      gsap.to(children,
+        { opacity: 1, y: 0, duration: 0.5, stagger: 0.1, ease: 'power3.out', delay: 0.15 }
       )
 
       const nav = step.querySelector('.wizard-nav-row')
       if (nav) {
-        gsap.fromTo(nav,
-          { y: 20, opacity: 0 },
-          { y: 0, opacity: 1, duration: 0.4, ease: 'power3.out', delay: 0.25 }
+        gsap.set(nav, { opacity: 0, y: 20 })
+        gsap.to(nav,
+          { opacity: 1, y: 0, duration: 0.4, ease: 'power3.out', delay: 0.25 }
         )
       }
     }
@@ -362,7 +370,7 @@ export default function ContactPage() {
             {screen === 'quote_services' && (
               <motion.div key="quote-services" className="wizard-step" {...fade}>
                 <h3 className="wizard-step-title">Get a Quote</h3>
-                <p className="wizard-step-desc">Ready to team up? My passion for creative excellence sets me apart. How can I help you?</p>
+                <p className="wizard-step-desc">Got a project in mind? Let's turn your idea into reality. <br />Which services are you interested in? </p>
                 <div className="wizard-options wizard-options-grid">
                   {services.map(s => (
                     <button key={s} className={`wizard-pill ${servicesSelected.includes(s) ? 'wizard-pill-active' : ''}`} onClick={() => toggleService(s)}>{s}</button>
