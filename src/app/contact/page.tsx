@@ -140,7 +140,7 @@ export default function ContactPage() {
           gsap.set(el, { opacity: 1 })
           gsap.fromTo(split.words,
             { opacity: 0, y: 12 },
-            { opacity: 1, y: 0, duration: 0.5, stagger: 0.03, ease: 'power2.out' }
+            { opacity: 1, y: 0, duration: 0.5, stagger: 0.03, ease: 'power2.out', clearProps: 'transform' }
           )
         }
         const btnsContainer = step.querySelector('.wizard-options')
@@ -150,7 +150,7 @@ export default function ContactPage() {
         const btns = step.querySelectorAll('.wizard-greeting-btn')
         gsap.set(btns, { opacity: 0, y: 20 })
         gsap.to(btns,
-          { opacity: 1, y: 0, duration: 0.5, stagger: 0.12, ease: 'power3.out', delay: 0.3 }
+          { opacity: 1, y: 0, duration: 0.5, stagger: 0.12, ease: 'power3.out', delay: 0.3, clearProps: 'transform' }
         )
         return
       }
@@ -162,21 +162,21 @@ export default function ContactPage() {
         gsap.set(desc, { opacity: 1 })
         gsap.fromTo(split.words,
           { y: 20, opacity: 0 },
-          { y: 0, opacity: 1, duration: 0.5, stagger: 0.03, ease: 'power3.out' }
+          { y: 0, opacity: 1, duration: 0.5, stagger: 0.03, ease: 'power3.out', clearProps: 'transform' }
         )
       }
 
       const children = step.querySelectorAll('.wizard-options, .wizard-form, .wizard-colors, .wizard-service-details')
       gsap.set(children, { opacity: 0, y: 20 })
       gsap.to(children,
-        { opacity: 1, y: 0, duration: 0.5, stagger: 0.1, ease: 'power3.out', delay: 0.15 }
+        { opacity: 1, y: 0, duration: 0.5, stagger: 0.1, ease: 'power3.out', delay: 0.15, clearProps: 'transform' }
       )
 
       const nav = step.querySelector('.wizard-nav-row')
       if (nav) {
         gsap.set(nav, { opacity: 0, y: 20 })
         gsap.to(nav,
-          { opacity: 1, y: 0, duration: 0.4, ease: 'power3.out', delay: 0.25 }
+          { opacity: 1, y: 0, duration: 0.4, ease: 'power3.out', delay: 0.25, clearProps: 'transform' }
         )
       }
     }
@@ -206,13 +206,13 @@ export default function ContactPage() {
       greeting: 'greeting',
       contact_form: 'greeting',
       quote_services: 'greeting',
-      quote_budget: 'quote_services',
-      quote_details: 'quote_budget',
+      quote_details: 'quote_services',
       quote_duration: 'quote_details',
       quote_brand: 'quote_details',
       quote_colors: 'quote_brand',
       quote_desc: hasDuration ? 'quote_duration' : hasColors ? 'quote_colors' : 'quote_brand',
-      quote_contact: 'quote_desc',
+      quote_budget: 'quote_desc',
+      quote_contact: 'quote_budget',
       success: 'greeting',
     }
     if (backMap[screen] === 'greeting') resetWizard()
@@ -387,7 +387,7 @@ export default function ContactPage() {
                   </button>
                   <button className="wizard-capsule-btn wizard-capsule-continue" disabled={servicesSelected.length === 0} onClick={() => {
                     if (servicesSelected.length === 0) { setServiceError('Please select at least one service.'); return }
-                    setScreen('quote_budget')
+                    setScreen('quote_details')
                   }}>
                     <span className="wizard-capsule-text">Continue</span>
                     <span className="wizard-capsule-circle">
@@ -416,7 +416,7 @@ export default function ContactPage() {
                     </span>
                     <span className="wizard-capsule-text">Go back</span>
                   </button>
-                  <button className="wizard-capsule-btn wizard-capsule-continue" disabled={!budget} onClick={() => setScreen('quote_details')}>
+                  <button className="wizard-capsule-btn wizard-capsule-continue" disabled={!budget} onClick={() => setScreen('quote_contact')}>
                     <span className="wizard-capsule-text">Continue</span>
                     <span className="wizard-capsule-circle">
                       <span className="wizard-capsule-arrow wizard-capsule-arrow-normal"><ArrowSVG /></span>
@@ -582,7 +582,7 @@ export default function ContactPage() {
                       </span>
                       <span className="wizard-capsule-text">Go back</span>
                     </button>
-                    <button className="wizard-capsule-btn wizard-capsule-continue" onClick={() => setScreen('quote_contact')}>
+                    <button className="wizard-capsule-btn wizard-capsule-continue" onClick={() => setScreen('quote_budget')}>
                       <span className="wizard-capsule-text">Continue</span>
                       <span className="wizard-capsule-circle">
                         <span className="wizard-capsule-arrow wizard-capsule-arrow-normal"><ArrowSVG /></span>
